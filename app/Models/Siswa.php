@@ -20,7 +20,7 @@ class Siswa extends Model
         'agama',
         'alamat',
         'kelas',
-        'jurusan',
+        'jurusan_id',
         // Data Orang Tua
         'nama_ayah',
         'nik_ayah',

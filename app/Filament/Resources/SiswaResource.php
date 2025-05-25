@@ -65,9 +65,10 @@ class SiswaResource extends Resource
                         Forms\Components\TextInput::make('kelas')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('jurusan')
-                            ->required()
-                            ->maxLength(255),
+                        Forms\Components\Select::make('jurusan_id')
+                            ->label('Jurusan')
+                            ->relationship('jurusan', 'nama_jurusan')
+                            ->required(),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Data Ayah')
@@ -141,7 +142,7 @@ class SiswaResource extends Resource
                 Tables\Columns\TextColumn::make('nama'),
                 Tables\Columns\TextColumn::make('nis'),
                 Tables\Columns\TextColumn::make('kelas'),
-                Tables\Columns\TextColumn::make('jurusan'),
+                Tables\Columns\TextColumn::make('jurusan.nama_jurusan')->label('Jurusan'),
                 Tables\Columns\ImageColumn::make('foto'),
                 Tables\Columns\BooleanColumn::make('status'),
                 Tables\Columns\TextColumn::make('created_at')

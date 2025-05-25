@@ -16,6 +16,11 @@ class Prestasi extends Model
         'status'
     ];
 
+    protected $casts = [
+        'tanggal' => 'date',
+        'status' => 'boolean'
+    ];
+
     public function kategori()
     {
         return $this->belongsTo(KategoriPrestasi::class, 'kategori_id');

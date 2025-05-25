@@ -43,6 +43,7 @@ return new class extends Migration
             $table->string('whatsapp')->nullable();
             $table->string('telegram')->nullable();
             $table->string('banner_highlight')->nullable(); //muncul popup/modal saat halaman web dibuka
+            $table->string('gedung_image')->nullable(); //gambar gedung sekolah untuk halaman profil
             $table->timestamps();
         });
     }

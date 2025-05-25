@@ -10,13 +10,18 @@ class GaleriController extends Controller
 {
     public function index()
     {
-        $galeris = Galeri::where('status', true)->latest()->paginate(12);
-        return view('web.galeri.index', compact('galeris'));
+        $galeri = Galeri::with('foto')
+            ->where('status', true)
+            ->latest()
+            ->paginate(12);
+
+        return view('web.galeri.index', compact('galeri'));
     }
 
     public function foto()
     {
-        $galeris = Galeri::where('status', true)
+        $galeris = Galeri::with('foto')
+            ->where('status', true)
             ->where('jenis', 'foto')
             ->latest()
             ->paginate(12);
@@ -25,7 +30,8 @@ class GaleriController extends Controller
 
     public function video()
     {
-        $galeris = Galeri::where('status', true)
+        $galeris = Galeri::with('foto')
+            ->where('status', true)
             ->where('jenis', 'video')
             ->latest()
             ->paginate(12);
@@ -34,7 +40,7 @@ class GaleriController extends Controller
 
     public function show($id)
     {
-        $galeri = Galeri::findOrFail($id);
+        $galeri = Galeri::with('foto')->findOrFail($id);
         return view('web.galeri.show', compact('galeri'));
     }
 

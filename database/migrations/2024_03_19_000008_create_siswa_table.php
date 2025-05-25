@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('agama')->nullable();
             $table->text('alamat')->nullable();
             $table->string('kelas');
-            $table->string('jurusan');
+            $table->foreignId('jurusan_id')->constrained('jurusan')->onDelete('cascade');
             // Data Orang Tua
             $table->string('nama_ayah')->nullable();
             $table->string('nik_ayah', 16)->nullable();

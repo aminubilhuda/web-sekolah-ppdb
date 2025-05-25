@@ -16,12 +16,14 @@ class ProfilController extends Controller
 
     public function visiMisi()
     {
-        return view('web.profil.visi-misi');
+        $profil = \App\Models\ProfilSekolah::first();
+        return view('web.profil.visi-misi', compact('profil'));
     }
 
     public function akreditasi()
     {
-        return view('web.profil.akreditasi');
+        $profil = \App\Models\ProfilSekolah::first();
+        return view('web.profil.akreditasi', compact('profil'));
     }
 
     public function hubunganIndustri()

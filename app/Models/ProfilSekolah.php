@@ -42,7 +42,8 @@ class ProfilSekolah extends Model
         'tiktok',
         'whatsapp',
         'telegram',
-        'banner_highlight'
+        'banner_highlight',
+        'gedung_image'
     ];
 
     protected static function boot()

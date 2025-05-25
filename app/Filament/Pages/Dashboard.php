@@ -16,7 +16,7 @@ class Dashboard extends BaseDashboard
     protected static ?string $title = 'Dashboard';
     protected static ?int $navigationSort = -2;
 
-    protected function getHeaderWidgets(): array
+    public function getWidgets(): array
     {
         return [
             StatsOverview::class,

@@ -152,3 +152,5 @@ Route::get('/storage/{path}', function ($path) {
         ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 })->where('path', '.*');
+
+Route::get('/galeri', [App\Http\Controllers\Web\GaleriController::class, 'index'])->name('web.galeri.index');

@@ -3,12 +3,17 @@
 namespace Database\Seeders;
 
 use App\Models\Siswa;
+use App\Models\Jurusan;
 use Illuminate\Database\Seeder;
 
 class SiswaSeeder extends Seeder
 {
     public function run(): void
     {
+        $jurusanRPL = Jurusan::where('singkatan', 'RPL')->first();
+        $jurusanMM = Jurusan::where('singkatan', 'MM')->first();
+        $jurusanTKJ = Jurusan::where('singkatan', 'TKJ')->first();
+
         $siswas = [
             [
                 'nama' => 'Ahmad Rizki',
@@ -21,7 +26,7 @@ class SiswaSeeder extends Seeder
                 'agama' => 'Islam',
                 'alamat' => 'Jl. Merdeka No. 123, Jakarta',
                 'kelas' => 'X RPL 1',
-                'jurusan' => 'Rekayasa Perangkat Lunak',
+                'jurusan_id' => $jurusanRPL->id,
                 'nama_ayah' => 'Budi Santoso',
                 'nik_ayah' => '1234567890123457',
                 'pekerjaan_ayah' => 'Wiraswasta',
@@ -44,7 +49,7 @@ class SiswaSeeder extends Seeder
                 'agama' => 'Islam',
                 'alamat' => 'Jl. Asia Afrika No. 78, Bandung',
                 'kelas' => 'X MM 1',
-                'jurusan' => 'Multimedia',
+                'jurusan_id' => $jurusanMM->id,
                 'nama_ayah' => 'Ahmad Hidayat',
                 'nik_ayah' => '1234567890123460',
                 'pekerjaan_ayah' => 'PNS',
@@ -67,7 +72,7 @@ class SiswaSeeder extends Seeder
                 'agama' => 'Islam',
                 'alamat' => 'Jl. Basuki Rahmat No. 56, Surabaya',
                 'kelas' => 'X TKJ 1',
-                'jurusan' => 'Teknik Komputer dan Jaringan',
+                'jurusan_id' => $jurusanTKJ->id,
                 'nama_ayah' => 'Slamet Riyadi',
                 'nik_ayah' => '1234567890123463',
                 'pekerjaan_ayah' => 'Wiraswasta',

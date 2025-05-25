@@ -26,7 +26,7 @@
                         <div class="card-body">
                             <h2 class="text-2xl font-bold text-gray-900 mb-6">Kirim Pesan</h2>
                             
-                            <form action="{{ route('contact.store') }}" method="POST" class="space-y-6">
+                            <form action="{{ route('web.contact.store') }}" method="POST" class="space-y-6">
                                 @csrf
                                 
                                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">

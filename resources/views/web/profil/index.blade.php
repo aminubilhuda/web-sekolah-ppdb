@@ -8,7 +8,7 @@
     <!-- Hero Section -->
     <div class="relative bg-primary-600 rounded-lg overflow-hidden mb-8">
         <div class="absolute inset-0">
-            <img class="w-full h-full object-cover" src="{{ asset('images/school-building.jpg') }}" alt="Gedung Sekolah">
+            <img class="w-full h-full object-cover" src="{{ $profil && $profil->gedung_image ? asset('storage/' . $profil->gedung_image) : asset('images/school-building.jpg') }}" alt="Gedung Sekolah">
             <div class="absolute inset-0 bg-primary-600 mix-blend-multiply"></div>
         </div>
         <div class="relative max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
