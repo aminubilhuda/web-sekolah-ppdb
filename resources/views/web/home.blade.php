@@ -129,13 +129,14 @@
         .swiper-slide {
             position: relative;
             overflow: hidden;
+            height: 100vh;
         }
 
         .swiper-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: scale(1.2);
+            transform: scale(1.1);
             transition: transform 1.5s ease;
         }
 
@@ -145,24 +146,20 @@
 
         .slide-content {
             position: absolute;
-            bottom: 0;
             left: 0;
-            right: 0;
+            top: 50%;
+            transform: translateY(-50%) translateX(-50px);
             padding: 4rem;
-            background: linear-gradient(to top, 
-                rgba(0,0,0,0.9) 0%,
-                rgba(0,0,0,0.7) 30%,
-                rgba(0,0,0,0.4) 60%,
-                transparent 100%);
+            max-width: 600px;
             color: white;
-            transform: translateY(100px);
             opacity: 0;
             transition: all 0.8s ease;
+            z-index: 2;
         }
 
         .swiper-slide-active .slide-content {
-            transform: translateY(0);
             opacity: 1;
+            transform: translateY(-50%) translateX(0);
         }
 
         .slide-content h2 {
@@ -170,17 +167,67 @@
             font-weight: 800;
             margin-bottom: 1rem;
             line-height: 1.2;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            background: linear-gradient(to right, #fff, #e2e8f0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: all 0.8s ease 0.2s;
+        }
+
+        .swiper-slide-active .slide-content h2 {
+            opacity: 1;
         }
 
         .slide-content p {
             font-size: 1.25rem;
-            max-width: 600px;
+            max-width: 500px;
             margin-bottom: 2rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: all 0.8s ease 0.4s;
+        }
+
+        .swiper-slide-active .slide-content p {
+            opacity: 1;
+        }
+
+        .slide-content .cta-button {
+            opacity: 0;
+            transition: all 0.8s ease 0.6s;
+            background: #ffffff;
+            color: #2563EB;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .swiper-slide-active .slide-content .cta-button {
+            opacity: 1;
+        }
+
+        .slide-content .cta-button:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .swiper-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, 
+                rgba(0,0,0,0.9) 0%,
+                rgba(0,0,0,0.7) 30%,
+                rgba(0,0,0,0.5) 50%,
+                rgba(0,0,0,0.3) 70%,
+                rgba(0,0,0,0.1) 100%);
+            z-index: 1;
         }
 
         .swiper-button-next,
@@ -576,12 +623,13 @@
                                 <p>{{ $slider->deskripsi }}</p>
                             @endif
                             @if ($slider->link)
-                                <a href="{{ $slider->link }}" class="cta-button cta-button-primary">Lihat Detail</a>
+                                <a href="{{ $slider->link }}" class="cta-button">Lihat Detail</a>
                             @endif
                         </div>
                     </div>
                 @empty
                     <div class="swiper-slide">
+                        <img src="{{ asset('images/default-slider.jpg') }}" alt="Default Slider">
                         <div class="slide-content">
                             <h2>Selamat Datang</h2>
                             <p>Tambahkan slider baru melalui dashboard admin.</p>
@@ -839,7 +887,6 @@
 
             // Show modal when page loads
             if (modal) {
-                // Add a small delay before showing the modal
                 setTimeout(() => {
                     modal.style.display = 'block';
                 }, 1000);
@@ -878,20 +925,29 @@
                     },
                     loop: true,
                     on: {
-                        slideChangeTransitionStart: function () {
+                        init: function() {
+                            this.slides.forEach((slide, index) => {
+                                const content = slide.querySelector('.slide-content');
+                                if (content) {
+                                    content.style.opacity = '0';
+                                    content.style.transform = 'translateY(-50%) translateX(-50px)';
+                                }
+                            });
+                        },
+                        slideChangeTransitionStart: function() {
                             const activeSlide = this.slides[this.activeIndex];
                             const content = activeSlide.querySelector('.slide-content');
                             if (content) {
                                 content.style.opacity = '0';
-                                content.style.transform = 'translateY(100px)';
+                                content.style.transform = 'translateY(-50%) translateX(-50px)';
                             }
                         },
-                        slideChangeTransitionEnd: function () {
+                        slideChangeTransitionEnd: function() {
                             const activeSlide = this.slides[this.activeIndex];
                             const content = activeSlide.querySelector('.slide-content');
                             if (content) {
                                 content.style.opacity = '1';
-                                content.style.transform = 'translateY(0)';
+                                content.style.transform = 'translateY(-50%) translateX(0)';
                             }
                         }
                     }
