@@ -29,6 +29,9 @@ class JurusanResource extends Resource
                 Forms\Components\TextInput::make('nama_jurusan')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('singkatan')
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('deskripsi')
                     ->required()
                     ->columnSpanFull(),
@@ -54,6 +57,8 @@ class JurusanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama_jurusan')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('singkatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deskripsi')
                     ->limit(50)

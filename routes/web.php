@@ -58,9 +58,13 @@ Route::get('/ekstrakurikuler', [EkstrakurikulerController::class, 'index'])->nam
 Route::get('/ekstrakurikuler/{ekstrakurikuler}', [EkstrakurikulerController::class, 'show'])->name('web.ekstrakurikuler.show');
 
 // Alumni
-Route::get('/alumni', [AlumniController::class, 'index'])->name('web.alumni.index');
-Route::get('/alumni/search', [AlumniController::class, 'search'])->name('web.alumni.search');
-Route::get('/alumni/{alumni}', [AlumniController::class, 'show'])->name('web.alumni.show');
+Route::prefix('alumni')->name('web.alumni.')->group(function () {
+    Route::get('/', [AlumniController::class, 'index'])->name('index');
+    Route::get('/testimoni', [AlumniController::class, 'testimoni'])->name('testimoni');
+    Route::get('/bekerja', [AlumniController::class, 'bekerja'])->name('bekerja');
+    Route::get('/kuliah', [AlumniController::class, 'kuliah'])->name('kuliah');
+    Route::get('/{alumni}', [AlumniController::class, 'show'])->name('show');
+});
 
 // Guru
 Route::get('/guru', [GuruController::class, 'index'])->name('web.guru.index');

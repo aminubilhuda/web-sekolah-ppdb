@@ -30,32 +30,43 @@ class GuruResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nip')
-                    ->nullable()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('bidang_studi')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('deskripsi')
-                    ->nullable()
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('foto')
-                    ->image()
-                    ->directory('guru')
-                    ->disk('public')
-                    ->visibility('public')
-                    ->preserveFilenames()
-                    ->imagePreviewHeight('250')
-                    ->panelAspectRatio('2:1')
-                    ->panelLayout('integrated')
-                    ->nullable()
-                    ->columnSpanFull(),
-                Forms\Components\Toggle::make('status')
-                    ->required()
-                    ->default(true),
+                Forms\Components\Section::make('Informasi Dasar')
+                    ->schema([
+                        Forms\Components\TextInput::make('nama')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('nip')
+                            ->label('NIP')
+                            ->nullable()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('jabatan')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('bidang_studi')
+                            ->required()
+                            ->maxLength(255),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Informasi Tambahan')
+                    ->schema([
+                        Forms\Components\Textarea::make('deskripsi')
+                            ->nullable()
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('foto')
+                            ->image()
+                            ->directory('guru')
+                            ->disk('public')
+                            ->visibility('public')
+                            ->preserveFilenames()
+                            ->imagePreviewHeight('250')
+                            ->panelAspectRatio('2:1')
+                            ->panelLayout('integrated')
+                            ->nullable()
+                            ->columnSpanFull(),
+                        Forms\Components\Toggle::make('status')
+                            ->required()
+                            ->default(true),
+                    ])->columns(2),
             ]);
     }
 
@@ -66,6 +77,9 @@ class GuruResource extends Resource
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nip')
+                    ->label('NIP')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('jabatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('bidang_studi')
                     ->searchable(),
@@ -105,7 +119,7 @@ class GuruResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListGurus::route('/'),
+            'index' => Pages\ListGuru::route('/'),
             'create' => Pages\CreateGuru::route('/create'),
             'edit' => Pages\EditGuru::route('/{record}/edit'),
         ];

@@ -11,10 +11,13 @@ return new class extends Migration
         Schema::create('agenda', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
+            $table->string('slug')->unique();
             $table->text('deskripsi');
             $table->dateTime('tanggal_mulai');
             $table->dateTime('tanggal_selesai');
             $table->string('lokasi')->nullable();
+            $table->string('penanggung_jawab')->nullable();
+            $table->boolean('is_published')->default(false);
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

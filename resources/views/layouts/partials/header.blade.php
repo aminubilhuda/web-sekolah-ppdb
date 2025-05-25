@@ -1,9 +1,9 @@
-<header class="bg-white shadow-sm">
-    <div class="container mx-auto px-4 py-0">
+<header class="bg-white shadow-sm flex items-center">
+    <div class="container mx-auto px-4 py-1 h-8">
         <div class="flex items-center justify-between">
             <!-- Logo -->
             <div class="flex-shrink-0 hidden md:flex items-center space-x-3">
-                 <div class="flex items-cente">
+                 <div class="flex items-center">
                     <div class="h-3 w-auto">
                         <p class="text-xs text-gray-600">Telp : {{ $profil->no_hp ?? '(021) 1234567' }}</p>
                     </div>

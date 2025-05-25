@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\PrestasiController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\DownloadController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\Lk3Controller;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,72 +29,65 @@ use App\Http\Controllers\Api\ContactController;
 |
 */
 
+Route::middleware('api')->group(function () {
+    // Profil Sekolah CRUD
+    Route::apiResource('profil-sekolah', ProfilSekolahController::class);
+    
+    // Berita CRUD
+    Route::apiResource('berita', BeritaController::class);
+    
+    // Agenda CRUD
+    Route::apiResource('agenda', AgendaController::class);
+    
+    // Jurusan CRUD
+    Route::apiResource('jurusan', JurusanController::class);
+    
+    // Ekstrakurikuler CRUD
+    Route::apiResource('ekstrakurikuler', EkstrakurikulerController::class);
+    
+    // Alumni CRUD
+    Route::apiResource('alumni', AlumniController::class);
+    Route::get('/alumni/testimoni', [AlumniController::class, 'testimoni']);
+    Route::get('/alumni/bekerja', [AlumniController::class, 'bekerja']);
+    Route::get('/alumni/kuliah', [AlumniController::class, 'kuliah']);
+    Route::get('/alumni/jurusan/{jurusan_id}', [AlumniController::class, 'byJurusan']);
+    Route::get('/alumni/tahun/{tahun}', [AlumniController::class, 'byTahunLulus']);
+    
+    // Guru CRUD
+    Route::apiResource('guru', GuruController::class);
+    
+    // Siswa CRUD
+    Route::apiResource('siswa', SiswaController::class);
+    
+    // PPDB
+    Route::post('/ppdb', [PpdbController::class, 'store']);
+    Route::post('/ppdb/check-status', [PpdbController::class, 'checkStatus']);
+    
+    // Galeri CRUD
+    Route::apiResource('galeri', GaleriController::class);
+    Route::get('/galeri/foto', [GaleriController::class, 'foto']);
+    Route::get('/galeri/video', [GaleriController::class, 'video']);
+    
+    // Prestasi CRUD
+    Route::apiResource('prestasi', PrestasiController::class);
+    Route::get('/prestasi/akademik', [PrestasiController::class, 'akademik']);
+    Route::get('/prestasi/non-akademik', [PrestasiController::class, 'nonAkademik']);
+    
+    // FAQ CRUD
+    Route::apiResource('faq', FaqController::class);
+    
+    // Download CRUD
+    Route::apiResource('download', DownloadController::class);
+    Route::get('/download/formulir', [DownloadController::class, 'formulir']);
+    Route::get('/download/dokumen', [DownloadController::class, 'dokumen']);
+    
+    // Contact
+    Route::post('/contact', [ContactController::class, 'store']);
+    
+    // LK3 CRUD
+    Route::apiResource('lk3', Lk3Controller::class);
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-});
-
-// Profil Sekolah
-Route::get('/profil-sekolah', [ProfilSekolahController::class, 'index']);
-
-// Berita
-Route::get('/berita', [BeritaController::class, 'index']);
-Route::get('/berita/{id}', [BeritaController::class, 'show']);
-
-// Agenda
-Route::get('/agenda', [AgendaController::class, 'index']);
-Route::get('/agenda/{id}', [AgendaController::class, 'show']);
-
-// Jurusan
-Route::get('/jurusan', [JurusanController::class, 'index']);
-Route::get('/jurusan/{id}', [JurusanController::class, 'show']);
-
-// Ekstrakurikuler
-Route::get('/ekstrakurikuler', [EkstrakurikulerController::class, 'index']);
-Route::get('/ekstrakurikuler/{id}', [EkstrakurikulerController::class, 'show']);
-
-// Alumni
-Route::get('/alumni', [AlumniController::class, 'index']);
-Route::get('/alumni/{id}', [AlumniController::class, 'show']);
-Route::get('/alumni/testimoni', [AlumniController::class, 'testimoni']);
-Route::get('/alumni/bekerja', [AlumniController::class, 'bekerja']);
-
-// Guru
-Route::get('/guru', [GuruController::class, 'index']);
-Route::get('/guru/{id}', [GuruController::class, 'show']);
-
-// Siswa
-Route::get('/siswa', [SiswaController::class, 'index']);
-Route::get('/siswa/{id}', [SiswaController::class, 'show']);
-
-// PPDB
-Route::post('/ppdb', [PpdbController::class, 'store']);
-Route::post('/ppdb/check-status', [PpdbController::class, 'checkStatus']);
-
-// Galeri
-Route::prefix('galeri')->group(function () {
-    Route::get('/', [GaleriController::class, 'index']);
-    Route::get('/foto', [GaleriController::class, 'foto']);
-    Route::get('/video', [GaleriController::class, 'video']);
-    Route::get('/{id}', [GaleriController::class, 'show']);
-});
-
-// Prestasi
-Route::prefix('prestasi')->group(function () {
-    Route::get('/', [PrestasiController::class, 'index']);
-    Route::get('/akademik', [PrestasiController::class, 'akademik']);
-    Route::get('/non-akademik', [PrestasiController::class, 'nonAkademik']);
-    Route::get('/{id}', [PrestasiController::class, 'show']);
-});
-
-// FAQ
-Route::get('/faq', [FaqController::class, 'index']);
-
-// Download
-Route::prefix('download')->group(function () {
-    Route::get('/', [DownloadController::class, 'index']);
-    Route::get('/formulir', [DownloadController::class, 'formulir']);
-    Route::get('/dokumen', [DownloadController::class, 'dokumen']);
-});
-
-// Contact
-Route::post('/contact', [ContactController::class, 'store']); 
+}); 

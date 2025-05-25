@@ -10,7 +10,7 @@
         "intervention/image": "^2.7",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
-        "laravel/telescope": "^5.0",
+        "laravel/telescope": "^5.7",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
         "predis/predis": "^2.2",

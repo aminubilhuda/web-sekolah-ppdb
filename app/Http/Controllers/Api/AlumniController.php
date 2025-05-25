@@ -10,19 +10,20 @@ class AlumniController extends Controller
 {
     public function index()
     {
-        $alumni = Alumni::where('status', true)->get();
+        $alumni = Alumni::with('jurusan')->active()->get();
         return response()->json($alumni);
     }
 
     public function show($id)
     {
-        $alumni = Alumni::findOrFail($id);
+        $alumni = Alumni::with('jurusan')->findOrFail($id);
         return response()->json($alumni);
     }
 
     public function testimoni()
     {
-        $testimoni = Alumni::where('status', true)
+        $testimoni = Alumni::with('jurusan')
+            ->active()
             ->whereNotNull('testimoni')
             ->get();
         return response()->json($testimoni);
@@ -30,9 +31,37 @@ class AlumniController extends Controller
 
     public function bekerja()
     {
-        $bekerja = Alumni::where('status', true)
-            ->whereNotNull('tempat_kerja')
+        $bekerja = Alumni::with('jurusan')
+            ->active()
+            ->bekerja()
             ->get();
         return response()->json($bekerja);
+    }
+
+    public function kuliah()
+    {
+        $kuliah = Alumni::with('jurusan')
+            ->active()
+            ->kuliah()
+            ->get();
+        return response()->json($kuliah);
+    }
+
+    public function byJurusan($jurusan_id)
+    {
+        $alumni = Alumni::with('jurusan')
+            ->active()
+            ->where('jurusan_id', $jurusan_id)
+            ->get();
+        return response()->json($alumni);
+    }
+
+    public function byTahunLulus($tahun)
+    {
+        $alumni = Alumni::with('jurusan')
+            ->active()
+            ->where('tahun_lulus', $tahun)
+            ->get();
+        return response()->json($alumni);
     }
 } 

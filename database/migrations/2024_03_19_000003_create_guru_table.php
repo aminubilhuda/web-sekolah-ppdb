@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->string('nip')->nullable();
+            $table->string('jabatan');
             $table->string('bidang_studi');
             $table->string('foto')->nullable();
             $table->text('deskripsi')->nullable();

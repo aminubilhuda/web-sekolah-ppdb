@@ -165,6 +165,20 @@ class PpdbResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('terima')
+                    ->label('Terima')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(fn (Ppdb $record) => $record->update(['status' => 'Diterima']))
+                    ->visible(fn (Ppdb $record) => $record->status === 'Menunggu'),
+                Tables\Actions\Action::make('tolak')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(fn (Ppdb $record) => $record->update(['status' => 'Ditolak']))
+                    ->visible(fn (Ppdb $record) => $record->status === 'Menunggu'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
