@@ -4,128 +4,134 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PpdbResource\Pages;
 use App\Models\Ppdb;
-use App\Models\Jurusan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Actions\Action;
-use App\Exports\PpdbExport;
-use Maatwebsite\Excel\Facades\Excel;
 
 class PpdbResource extends Resource
 {
     protected static ?string $model = Ppdb::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-
-    protected static ?string $navigationLabel = 'PPDB';
-
-    protected static ?string $modelLabel = 'PPDB';
-
-    protected static ?string $pluralModelLabel = 'PPDB';
-
-    protected static ?int $navigationSort = 6;
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationLabel = 'Pendaftar PPDB';
+    protected static ?string $modelLabel = 'Pendaftar PPDB';
+    protected static ?string $pluralModelLabel = 'Pendaftar PPDB';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama_lengkap')
-                    ->label('Nama Lengkap')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nisn')
-                    ->label('NISN')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('tempat_lahir')
-                    ->label('Tempat Lahir')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('tanggal_lahir')
-                    ->label('Tanggal Lahir')
-                    ->required(),
-                Forms\Components\Select::make('jenis_kelamin')
-                    ->label('Jenis Kelamin')
-                    ->options([
-                        'Laki-laki' => 'Laki-laki',
-                        'Perempuan' => 'Perempuan',
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('agama')
-                    ->label('Agama')
-                    ->options([
-                        'Islam' => 'Islam',
-                        'Kristen' => 'Kristen',
-                        'Katolik' => 'Katolik',
-                        'Hindu' => 'Hindu',
-                        'Buddha' => 'Buddha',
-                        'Konghucu' => 'Konghucu',
-                    ])
-                    ->required(),
-                Forms\Components\Textarea::make('alamat')
-                    ->label('Alamat')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('nama_ortu')
-                    ->label('Nama Orang Tua/Wali')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('no_hp')
-                    ->label('Nomor HP')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('asal_sekolah')
-                    ->label('Asal Sekolah')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('jurusan_pilihan')
-                    ->label('Jurusan Pilihan')
-                    ->relationship('jurusan', 'nama_jurusan')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\FileUpload::make('foto')
-                    ->label('Foto')
-                    ->image()
-                    ->directory('ppdb/foto')
-                    ->disk('public')
-                    ->visibility('public')
-                    ->preserveFilenames()
-                    ->imagePreviewHeight('250')
-                    ->panelAspectRatio('2:1')
-                    ->panelLayout('integrated')
-                    ->nullable()
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('ijazah')
-                    ->label('Ijazah')
-                    ->directory('ppdb/ijazah')
-                    ->disk('public')
-                    ->visibility('public')
-                    ->preserveFilenames()
-                    ->nullable()
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('kk')
-                    ->label('Kartu Keluarga')
-                    ->directory('ppdb/kk')
-                    ->disk('public')
-                    ->visibility('public')
-                    ->preserveFilenames()
-                    ->nullable()
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('status')
-                    ->label('Status')
-                    ->options([
-                        'Menunggu' => 'Menunggu',
-                        'Diterima' => 'Diterima',
-                        'Ditolak' => 'Ditolak',
-                    ])
-                    ->required()
-                    ->default('Menunggu'),
+                Forms\Components\Section::make('Data Pribadi')
+                    ->schema([
+                        Forms\Components\TextInput::make('nama_lengkap')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('nisn')
+                            ->required()
+                            ->maxLength(20),
+                        Forms\Components\TextInput::make('nik')
+                            ->required()
+                            ->maxLength(16),
+                        Forms\Components\TextInput::make('tempat_lahir')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\DatePicker::make('tanggal_lahir')
+                            ->required(),
+                        Forms\Components\Select::make('jenis_kelamin')
+                            ->options([
+                                'Laki-laki' => 'Laki-laki',
+                                'Perempuan' => 'Perempuan'
+                            ])
+                            ->required(),
+                        Forms\Components\Select::make('agama')
+                            ->options([
+                                'Islam' => 'Islam',
+                                'Kristen' => 'Kristen',
+                                'Katolik' => 'Katolik',
+                                'Hindu' => 'Hindu',
+                                'Buddha' => 'Buddha',
+                                'Konghucu' => 'Konghucu'
+                            ])
+                            ->required(),
+                        Forms\Components\Textarea::make('alamat')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('no_hp')
+                            ->tel()
+                            ->required()
+                            ->maxLength(20),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Data Sekolah')
+                    ->schema([
+                        Forms\Components\TextInput::make('asal_sekolah')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('tahun_lulus')
+                            ->required()
+                            ->maxLength(4),
+                        Forms\Components\Select::make('jurusan_pilihan')
+                            ->relationship('jurusan', 'nama_jurusan')
+                            ->required(),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Data Orang Tua')
+                    ->schema([
+                        Forms\Components\TextInput::make('nama_ayah')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('pekerjaan_ayah')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('no_hp_ayah')
+                            ->tel()
+                            ->required()
+                            ->maxLength(20),
+                        Forms\Components\TextInput::make('nama_ibu')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('pekerjaan_ibu')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('no_hp_ibu')
+                            ->tel()
+                            ->required()
+                            ->maxLength(20),
+                        Forms\Components\Textarea::make('alamat_ortu')
+                            ->required()
+                            ->columnSpanFull(),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Dokumen')
+                    ->schema([
+                        Forms\Components\FileUpload::make('foto')
+                            ->image()
+                            ->required()
+                            ->directory('ppdb/foto'),
+                        Forms\Components\FileUpload::make('ijazah')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->required()
+                            ->directory('ppdb/ijazah'),
+                        Forms\Components\FileUpload::make('kk')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->required()
+                            ->directory('ppdb/kk'),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Status')
+                    ->schema([
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'pending' => 'Menunggu',
+                                'approved' => 'Diterima',
+                                'rejected' => 'Ditolak'
+                            ])
+                            ->required()
+                            ->default('pending'),
+                    ]),
             ]);
     }
 
@@ -134,56 +140,43 @@ class PpdbResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama_lengkap')
-                    ->label('Nama Lengkap')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nisn')
-                    ->label('NISN')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('asal_sekolah')
-                    ->label('Asal Sekolah')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jurusan.nama_jurusan')
-                    ->label('Jurusan Pilihan')
+                    ->label('Jurusan')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('asal_sekolah')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Diterima' => 'success',
-                        'Ditolak' => 'danger',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
                         default => 'warning',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Tanggal Daftar')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Terakhir Diperbarui')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Menunggu',
+                        'approved' => 'Diterima',
+                        'rejected' => 'Ditolak'
+                    ]),
+                Tables\Filters\SelectFilter::make('jurusan_pilihan')
+                    ->relationship('jurusan', 'nama_jurusan'),
             ])
             ->actions([
-                Tables\Actions\Action::make('terima')
-                    ->label('Terima')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->action(fn (Ppdb $record) => $record->update(['status' => 'Diterima']))
-                    ->visible(fn (Ppdb $record) => $record->status === 'Menunggu'),
-                Tables\Actions\Action::make('tolak')
-                    ->label('Tolak')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->action(fn (Ppdb $record) => $record->update(['status' => 'Ditolak']))
-                    ->visible(fn (Ppdb $record) => $record->status === 'Menunggu'),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -202,19 +195,9 @@ class PpdbResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPpdb::route('/'),
+            'index' => Pages\ListPpdbs::route('/'),
             'create' => Pages\CreatePpdb::route('/create'),
             'edit' => Pages\EditPpdb::route('/{record}/edit'),
         ];
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return true;
-    }
-
-    public static function shouldRegisterCreateAction(): bool
-    {
-        return true;
     }
 } 

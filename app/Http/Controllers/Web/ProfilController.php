@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fasilitas;
+use App\Models\MitraIndustri;
 use Illuminate\Http\Request;
 
 class ProfilController extends Controller
@@ -28,7 +29,12 @@ class ProfilController extends Controller
 
     public function hubunganIndustri()
     {
-        return view('web.profil.hubungan-industri');
+        $mitra = MitraIndustri::where('status', 'aktif')->get();
+        $mitra_count = MitraIndustri::where('status', 'aktif')->count();
+        $siswa_magang = 0; // Ini bisa disesuaikan dengan data sebenarnya
+        $penyerapan = 0; // Ini bisa disesuaikan dengan data sebenarnya
+        
+        return view('web.profil.hubungan-industri', compact('mitra', 'mitra_count', 'siswa_magang', 'penyerapan'));
     }
 
     public function fasilitas()

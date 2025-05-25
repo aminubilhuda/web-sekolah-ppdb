@@ -5,15 +5,16 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
+   
     <!-- Hero Section -->
     <div class="relative bg-primary-600 rounded-lg overflow-hidden mb-8">
         <div class="absolute inset-0">
-            <img class="w-full h-full object-cover" src="{{ asset('images/ppdb-bg.jpg') }}" alt="PPDB Background">
+            <img class="w-full h-full object-cover" src="{{ Storage::url($ppdbInfo->gambar_background) }}" alt="PPDB Background">
             <div class="absolute inset-0 bg-primary-600 mix-blend-multiply"></div>
         </div>
         <div class="relative max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">PPDB 2024</h1>
-            <p class="mt-6 text-xl text-primary-100 max-w-3xl">Bergabunglah bersama kami untuk masa depan yang lebih cerah</p>
+            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">{{ $ppdbInfo->judul }}</h1>
+            <p class="mt-6 text-xl text-primary-100 max-w-3xl">{{ $ppdbInfo->subtitle }}</p>
             <div class="mt-8">
                 <a href="{{ route('web.ppdb.form') }}" class="inline-block bg-white text-primary-600 px-8 py-3 rounded-md font-medium hover:bg-primary-50">
                     Daftar Sekarang
@@ -31,18 +32,34 @@
                 
                 <h3>Persyaratan Umum:</h3>
                 <ul>
-                    <li>Lulusan SMP/MTs atau sederajat</li>
-                    <li>Usia maksimal 21 tahun pada tahun ajaran baru</li>
-                    <li>Sehat jasmani dan rohani</li>
-                    <li>Berkelakuan baik</li>
+                    @php
+                        $persyaratan = is_string($ppdbInfo->persyaratan) ? json_decode($ppdbInfo->persyaratan, true) : $ppdbInfo->persyaratan;
+                    @endphp
+                    @if(is_array($persyaratan))
+                        @foreach($persyaratan as $item)
+                            @if(is_array($item) && isset($item['item']))
+                                <li>{{ $item['item'] }}</li>
+                            @elseif(is_string($item))
+                                <li>{{ $item }}</li>
+                            @endif
+                        @endforeach
+                    @endif
                 </ul>
 
                 <h3>Jadwal Penting:</h3>
                 <ul>
-                    <li>Pendaftaran Online: 1 - 30 Juni 2024</li>
-                    <li>Verifikasi Berkas: 1 - 5 Juli 2024</li>
-                    <li>Pengumuman: 10 Juli 2024</li>
-                    <li>Daftar Ulang: 11 - 15 Juli 2024</li>
+                    @php
+                        $jadwal = is_string($ppdbInfo->jadwal) ? json_decode($ppdbInfo->jadwal, true) : $ppdbInfo->jadwal;
+                    @endphp
+                    @if(is_array($jadwal))
+                        @foreach($jadwal as $item)
+                            <li>
+                                {{ $item['kegiatan'] }}: 
+                                {{ \Carbon\Carbon::parse($item['tanggal_mulai'])->format('d M Y') }} - 
+                                {{ \Carbon\Carbon::parse($item['tanggal_selesai'])->format('d M Y') }}
+                            </li>
+                        @endforeach
+                    @endif
                 </ul>
             </div>
         </div>
@@ -84,9 +101,9 @@
                 </ol>
                 <p>Untuk informasi lebih lanjut, silakan hubungi panitia PPDB di:</p>
                 <ul>
-                    <li>Telepon: (021) 1234567</li>
-                    <li>WhatsApp: 0812-3456-7890</li>
-                    <li>Email: ppdb@sekolah.sch.id</li>
+                    <li>Telepon: {{ $ppdbInfo->telepon }}</li>
+                    <li>WhatsApp: {{ $ppdbInfo->whatsapp }}</li>
+                    <li>Email: {{ $ppdbInfo->email }}</li>
                 </ul>
             </div>
         </div>

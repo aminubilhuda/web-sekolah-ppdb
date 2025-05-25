@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\PPDB;
 use App\Models\Jurusan;
+use App\Models\PPDBInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +14,8 @@ class PPDBController extends Controller
     public function index()
     {
         $jurusans = Jurusan::all();
-        return view('web.ppdb.index', compact('jurusans'));
+        $ppdbInfo = PPDBInfo::first();
+        return view('web.ppdb.index', compact('jurusans', 'ppdbInfo'));
     }
 
     public function form()

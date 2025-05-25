@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MitraIndustri extends Model
 {
+    use HasFactory;
+
     protected $table = 'mitra_industri';
     
     protected $fillable = [
@@ -20,4 +23,9 @@ class MitraIndustri extends Model
         'telepon',
         'status'
     ];
+
+    public function getLogoUrlAttribute()
+    {
+        return $this->logo ? asset('storage/' . $this->logo) : null;
+    }
 } 

@@ -36,26 +36,16 @@
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-8 text-center">Mitra Kerjasama Kami</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @forelse($mitra ?? [] as $m)
-                        <div class="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300">
-                            <div class="flex items-center space-x-4">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ asset('storage/' . $m->logo) }}" alt="{{ $m->nama_perusahaan }}" class="w-16 h-16 object-contain">
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-semibold text-gray-900">{{ $m->nama_perusahaan }}</h3>
-                                    <p class="text-sm text-gray-600 mt-1">{{ $m->bidang_usaha }}</p>
-                                    <div class="mt-2">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                                            {{ $m->jenis_kerjasama }}
-                                        </span>
-                                    </div>
-                                </div>
+                        <div class="bg-gradient-to-br from-white to-primary-50 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center border border-primary-100">
+                            <div class="mb-4">
+                                <img src="{{ asset('storage/' . $m->logo) }}" alt="{{ $m->nama_perusahaan }}" class="w-32 h-32 object-contain">
                             </div>
-                            <div class="mt-4 pt-4 border-t border-gray-200">
-                                <p class="text-sm text-gray-600">{{ Str::limit($m->deskripsi, 100) }}</p>
-                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $m->nama_perusahaan }}</h3>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+                                {{ $m->jenis_kerjasama }}
+                            </span>
                         </div>
                     @empty
                         <div class="col-span-full">

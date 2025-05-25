@@ -18,6 +18,7 @@ use App\Http\Controllers\Web\FaqController;
 use App\Http\Controllers\Web\DownloadController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Web\MitraIndustriController;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,7 +123,7 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Admin Routes
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
     // PPDB Management
@@ -138,6 +139,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/{guru}', [App\Http\Controllers\Admin\GuruController::class, 'update'])->name('update');
         Route::delete('/{guru}', [App\Http\Controllers\Admin\GuruController::class, 'destroy'])->name('destroy');
     });
+
+    // Mitra Industri Routes
+    Route::resource('mitra-industri', MitraIndustriController::class);
 });
 
 Route::get('/storage/{path}', function ($path) {
