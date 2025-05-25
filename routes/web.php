@@ -75,11 +75,14 @@ Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa');
 Route::get('/siswa/{id}', [SiswaController::class, 'show'])->name('siswa.show');
 
 // PPDB
-Route::get('/ppdb', [PPDBController::class, 'index'])->name('web.ppdb.index');
-Route::get('/ppdb/form', [PPDBController::class, 'form'])->name('web.ppdb.form');
-Route::post('/ppdb/store', [PPDBController::class, 'store'])->name('web.ppdb.store');
-Route::get('/ppdb/status', [PPDBController::class, 'status'])->name('web.ppdb.status');
-Route::get('/ppdb/panduan', [PPDBController::class, 'panduan'])->name('web.ppdb.panduan');
+Route::prefix('ppdb')->name('web.ppdb.')->group(function () {
+    Route::get('/', [PPDBController::class, 'index'])->name('index');
+    Route::get('/form', [PPDBController::class, 'form'])->name('form');
+    Route::post('/store', [PPDBController::class, 'store'])->name('store');
+    Route::get('/success', [PPDBController::class, 'success'])->name('success');
+    Route::get('/status', [PPDBController::class, 'status'])->name('status');
+    Route::get('/panduan', [PPDBController::class, 'panduan'])->name('panduan');
+});
 
 // Contact
 Route::get('/contact', [ContactController::class, 'index'])->name('web.contact.index');
@@ -122,6 +125,10 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
+    // PPDB Management
+    Route::get('/ppdb', [App\Http\Controllers\Admin\PpdbController::class, 'index'])->name('ppdb.index');
+    Route::get('/ppdb/export', [App\Http\Controllers\Admin\PpdbController::class, 'export'])->name('ppdb.export');
+
     // Guru Management
     Route::prefix('guru')->name('guru.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\GuruController::class, 'index'])->name('index');

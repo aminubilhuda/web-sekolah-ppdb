@@ -21,6 +21,7 @@ class ProfilSekolah extends Model
         'sk_izin_operasional',
         'kepala_sekolah',
         'sambutan_kepala',
+        'sejarah',
         'video_profile',
         'visi',
         'misi',

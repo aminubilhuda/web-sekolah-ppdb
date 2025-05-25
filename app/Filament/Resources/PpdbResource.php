@@ -12,6 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
+use App\Exports\PpdbExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PpdbResource extends Resource
 {
@@ -203,5 +206,15 @@ class PpdbResource extends Resource
             'create' => Pages\CreatePpdb::route('/create'),
             'edit' => Pages\EditPpdb::route('/{record}/edit'),
         ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return true;
+    }
+
+    public static function shouldRegisterCreateAction(): bool
+    {
+        return true;
     }
 } 

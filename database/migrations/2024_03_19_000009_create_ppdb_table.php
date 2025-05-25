@@ -12,14 +12,23 @@ return new class extends Migration
             $table->id();
             $table->string('nama_lengkap');
             $table->string('nisn');
+            $table->string('nik');
             $table->string('tempat_lahir');
             $table->date('tanggal_lahir');
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->string('agama');
             $table->string('alamat');
-            $table->string('nama_ortu');
             $table->string('no_hp');
             $table->string('asal_sekolah');
+            $table->string('tahun_lulus');
+            //data orang tua / wali
+            $table->string('nama_ayah');
+            $table->string('pekerjaan_ayah');
+            $table->string('no_hp_ayah');
+            $table->string('nama_ibu');
+            $table->string('pekerjaan_ibu');
+            $table->string('no_hp_ibu');
+            $table->string('alamat_ortu');
             $table->string('jurusan_pilihan');
             $table->string('foto')->nullable();
             $table->string('ijazah')->nullable();

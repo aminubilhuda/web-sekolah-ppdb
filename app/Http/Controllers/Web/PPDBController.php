@@ -16,39 +16,59 @@ class PPDBController extends Controller
         return view('web.ppdb.index', compact('jurusans'));
     }
 
+    public function form()
+    {
+        $jurusans = Jurusan::where('status', true)->get();
+        return view('web.ppdb.form', compact('jurusans'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama_lengkap' => 'required|string|max:255',
             'nisn' => 'required|string|max:20|unique:ppdb',
+            'nik' => 'required|string|max:16',
             'tempat_lahir' => 'required|string|max:100',
             'tanggal_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|in:L,P',
+            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
             'agama' => 'required|string|max:20',
             'alamat' => 'required|string',
-            'asal_sekolah' => 'required|string|max:255',
-            'jurusan_id' => 'required|exists:jurusans,id',
-            'nama_ortu' => 'required|string|max:255',
             'no_hp' => 'required|string|max:20',
-            'foto' => 'required|image|max:2048',
-            'ijazah' => 'required|file|mimes:pdf|max:2048',
-            'kk' => 'required|file|mimes:pdf|max:2048'
+            'asal_sekolah' => 'required|string|max:255',
+            'tahun_lulus' => 'required|string|max:4',
+            'nama_ayah' => 'required|string|max:255',
+            'pekerjaan_ayah' => 'required|string|max:255',
+            'no_hp_ayah' => 'required|string|max:20',
+            'nama_ibu' => 'required|string|max:255',
+            'pekerjaan_ibu' => 'required|string|max:255',
+            'no_hp_ibu' => 'required|string|max:20',
+            'alamat_ortu' => 'required|string',
+            'jurusan_pilihan' => 'required|exists:jurusan,id',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'ijazah' => 'nullable|file|mimes:pdf|max:2048',
+            'kk' => 'nullable|file|mimes:pdf|max:2048'
         ]);
 
-        // Upload foto
-        $foto = $request->file('foto');
-        $fotoPath = $foto->store('ppdb/foto', 'public');
-        $validated['foto'] = $fotoPath;
+        // Upload foto jika ada
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $fotoPath = $foto->store('ppdb/foto', 'public');
+            $validated['foto'] = $fotoPath;
+        }
 
-        // Upload ijazah
-        $ijazah = $request->file('ijazah');
-        $ijazahPath = $ijazah->store('ppdb/ijazah', 'public');
-        $validated['ijazah'] = $ijazahPath;
+        // Upload ijazah jika ada
+        if ($request->hasFile('ijazah')) {
+            $ijazah = $request->file('ijazah');
+            $ijazahPath = $ijazah->store('ppdb/ijazah', 'public');
+            $validated['ijazah'] = $ijazahPath;
+        }
 
-        // Upload KK
-        $kk = $request->file('kk');
-        $kkPath = $kk->store('ppdb/kk', 'public');
-        $validated['kk'] = $kkPath;
+        // Upload KK jika ada
+        if ($request->hasFile('kk')) {
+            $kk = $request->file('kk');
+            $kkPath = $kk->store('ppdb/kk', 'public');
+            $validated['kk'] = $kkPath;
+        }
 
         // Generate nomor pendaftaran
         $validated['nomor_pendaftaran'] = 'PPDB-' . date('Y') . '-' . str_pad(PPDB::count() + 1, 4, '0', STR_PAD_LEFT);

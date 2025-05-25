@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('sk_izin_operasional')->nullable();
             $table->string('kepala_sekolah')->nullable();
             $table->text('sambutan_kepala')->nullable();
+            $table->text('sejarah')->nullable();
             $table->string('video_profile')->nullable();
             $table->text('visi')->nullable();
             $table->text('misi')->nullable();

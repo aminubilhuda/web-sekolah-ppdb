@@ -22,8 +22,7 @@
         <div class="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-6">Sejarah</h2>
             <div class="prose max-w-none">
-                <p>SMK didirikan pada tahun 1990 dengan visi untuk menghasilkan lulusan yang kompeten dan siap kerja. Sejak awal berdirinya, sekolah ini telah berkomitmen untuk memberikan pendidikan berkualitas dengan fokus pada pengembangan keterampilan praktis dan pengetahuan teoritis.</p>
-                <p>Sepanjang perjalanannya, SMK telah mengalami berbagai perkembangan signifikan dalam hal fasilitas, kurikulum, dan metode pembelajaran. Sekolah ini terus beradaptasi dengan perkembangan teknologi dan kebutuhan industri untuk memastikan lulusannya tetap relevan dan kompetitif di pasar kerja.</p>
+                {!! $profil->sejarah !!}
             </div>
         </div>
 
@@ -32,18 +31,13 @@
             <div class="bg-white rounded-lg shadow-md p-8">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Visi</h2>
                 <div class="prose max-w-none">
-                    <p>Menjadi lembaga pendidikan kejuruan terdepan yang menghasilkan lulusan berkompetensi tinggi, berkarakter, dan siap bersaing di era global.</p>
+                    <p>{{ $profil->visi }}</p>
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow-md p-8">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Misi</h2>
                 <div class="prose max-w-none">
-                    <ul>
-                        <li>Menyelenggarakan pendidikan kejuruan yang berkualitas dan berorientasi pada kebutuhan industri</li>
-                        <li>Mengembangkan kompetensi siswa melalui pembelajaran yang terintegrasi dengan dunia kerja</li>
-                        <li>Membentuk karakter siswa yang berakhlak mulia dan memiliki jiwa wirausaha</li>
-                        <li>Membangun kerjasama dengan berbagai pihak untuk meningkatkan kualitas pendidikan</li>
-                    </ul>
+                    {!! $profil->misi !!}
                 </div>
             </div>
         </div>

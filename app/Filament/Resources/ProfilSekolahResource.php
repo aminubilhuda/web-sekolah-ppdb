@@ -137,18 +137,43 @@ class ProfilSekolahResource extends Resource
                             ->label('Sambutan Kepala Sekolah')
                             ->required()
                             ->columnSpanFull(),
+                        Forms\Components\RichEditor::make('sejarah')
+                            ->label('Sejarah')
+                            ->required()
+                            ->columnSpanFull()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                            ]),
                         Forms\Components\TextInput::make('video_profile')
                             ->label('Video Profile')
                             ->nullable()
                             ->maxLength(255),
-                        Forms\Components\Textarea::make('visi')
+                        Forms\Components\RichEditor::make('visi')
                             ->label('Visi')
                             ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make('misi')
+                            ->columnSpanFull()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                            ]),
+                        Forms\Components\RichEditor::make('misi')
                             ->label('Misi')
                             ->required()
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                            ]),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Media')

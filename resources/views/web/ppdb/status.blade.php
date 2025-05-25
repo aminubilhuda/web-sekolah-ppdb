@@ -15,11 +15,11 @@
             </div>
             @endif
 
-            <form action="{{ route('web.ppdb.status') }}" method="GET" class="mb-8">
+            <form action="{{ route('web.ppdb.check') }}" method="GET" class="mb-8">
                 <div class="flex gap-4">
                     <div class="flex-1">
-                        <label for="no_pendaftaran" class="block text-sm font-medium text-gray-700">Nomor Pendaftaran</label>
-                        <input type="text" name="no_pendaftaran" id="no_pendaftaran" value="{{ request('no_pendaftaran') }}" required
+                        <label for="nomor_pendaftaran" class="block text-sm font-medium text-gray-700">Nomor Pendaftaran</label>
+                        <input type="text" name="nomor_pendaftaran" id="nomor_pendaftaran" value="{{ request('nomor_pendaftaran') }}" required
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             placeholder="Masukkan nomor pendaftaran">
                     </div>
@@ -31,19 +31,19 @@
                 </div>
             </form>
 
-            @if(isset($pendaftaran))
+            @if(isset($ppdb))
             <div class="border rounded-lg p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-semibold text-gray-900">Status Pendaftaran</h2>
                     <span class="px-3 py-1 rounded-full text-sm font-medium
-                        @if($pendaftaran->status == 'pending')
+                        @if($ppdb->status == 'pending')
                             bg-yellow-100 text-yellow-800
-                        @elseif($pendaftaran->status == 'approved')
+                        @elseif($ppdb->status == 'approved')
                             bg-green-100 text-green-800
-                        @elseif($pendaftaran->status == 'rejected')
+                        @elseif($ppdb->status == 'rejected')
                             bg-red-100 text-red-800
                         @endif">
-                        {{ ucfirst($pendaftaran->status) }}
+                        {{ ucfirst($ppdb->status) }}
                     </span>
                 </div>
 
@@ -53,24 +53,70 @@
                         <dl class="mt-2 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Nama Lengkap</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $pendaftaran->nama }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->nama_lengkap }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">NISN</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->nisn }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">NIK</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->nik }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Asal Sekolah</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $pendaftaran->asal_sekolah }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->asal_sekolah }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Tahun Lulus</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->tahun_lulus }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Jurusan Pilihan</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $pendaftaran->jurusan->nama }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->jurusan->nama_jurusan }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Tanggal Daftar</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $pendaftaran->created_at->format('d F Y H:i') }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->created_at->format('d F Y H:i') }}</dd>
                             </div>
                         </dl>
                     </div>
 
-                    @if($pendaftaran->status == 'approved')
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Data Orang Tua</h3>
+                        <dl class="mt-2 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Nama Ayah</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->nama_ayah }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Pekerjaan Ayah</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->pekerjaan_ayah }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">No. HP Ayah</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->no_hp_ayah }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Nama Ibu</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->nama_ibu }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Pekerjaan Ibu</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->pekerjaan_ibu }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">No. HP Ibu</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->no_hp_ibu }}</dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm font-medium text-gray-500">Alamat Orang Tua</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->alamat_ortu }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    @if($ppdb->status == 'approved')
                     <div class="bg-green-50 border border-green-200 rounded-md p-4">
                         <h3 class="text-lg font-medium text-green-800 mb-2">Selamat! Anda Diterima</h3>
                         <p class="text-green-700 mb-4">Silakan lakukan daftar ulang dengan membawa dokumen asli ke sekolah pada tanggal yang telah ditentukan.</p>
@@ -80,12 +126,12 @@
                             <p class="text-sm text-green-600"><strong>Tempat:</strong> Ruang PPDB SMK Negeri 1 Jakarta</p>
                         </div>
                     </div>
-                    @elseif($pendaftaran->status == 'rejected')
+                    @elseif($ppdb->status == 'rejected')
                     <div class="bg-red-50 border border-red-200 rounded-md p-4">
                         <h3 class="text-lg font-medium text-red-800 mb-2">Mohon Maaf</h3>
                         <p class="text-red-700">Pendaftaran Anda tidak dapat diproses karena beberapa alasan:</p>
                         <ul class="mt-2 list-disc list-inside text-sm text-red-600">
-                            @foreach($pendaftaran->keterangan as $ket)
+                            @foreach($ppdb->keterangan as $ket)
                             <li>{{ $ket }}</li>
                             @endforeach
                         </ul>
