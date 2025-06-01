@@ -3,13 +3,13 @@
 namespace App\Filament\Resources\FileManagerResource\Pages;
 
 use App\Filament\Resources\FileManagerResource;
-use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
-use Carbon\Carbon;
 use Illuminate\Pagination\Paginator;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class ListFileManager extends ListRecords
 {
@@ -26,47 +26,99 @@ class ListFileManager extends ListRecords
                     return redirect()->route('filament.abdira.resources.file-managers.index');
                 }),
                 
-            Actions\Action::make('storage_info')
-                ->label('Info Storage')
-                ->icon('heroicon-o-server')
-                ->color('warning')
-                ->modalHeading('Informasi Storage')
-                ->modalDescription($this->getStorageInfo())
-                ->slideOver(),
+            Actions\Action::make('test_download')
+                ->label('Test Download')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
+                ->action(function () {
+                    // Find first file to test download
+                    $publicPath = storage_path('app/public');
+                    if (\Illuminate\Support\Facades\File::exists($publicPath)) {
+                        $files = \Illuminate\Support\Facades\File::allFiles($publicPath);
+                        if (!empty($files)) {
+                            $firstFile = $files[0];
+                            $fileName = $firstFile->getFilename();
+                            
+                            \Log::info('Test download', ['file' => $fileName]);
+                            
+                            return response()->download($firstFile->getPathname(), $fileName);
+                        }
+                    }
+                    
+                    \Filament\Notifications\Notification::make()
+                        ->title('Info')
+                        ->body('Tidak ada file untuk di-download')
+                        ->info()
+                        ->send();
+                }),
         ];
     }
 
-    protected function paginateTableQuery(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Pagination\Paginator
+    public function mount(): void
+    {
+        parent::mount();
+        
+        // Handle test parameter
+        if (request()->get('test') === '1') {
+            \Filament\Notifications\Notification::make()
+                ->title('Test Berhasil!')
+                ->body('Action URL berhasil dipanggil! Action sistem bekerja.')
+                ->success()
+                ->send();
+        }
+        
+        // Handle flash messages from redirect
+        if (session()->has('success')) {
+            \Filament\Notifications\Notification::make()
+                ->title('Berhasil')
+                ->body(session('success'))
+                ->success()
+                ->send();
+        }
+        
+        if (session()->has('error')) {
+            \Filament\Notifications\Notification::make()
+                ->title('Error')
+                ->body(session('error'))
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function getTableRecords(): \Illuminate\Pagination\Paginator
     {
         try {
             $storageFiles = collect();
             $publicPath = storage_path('app/public');
             
+            \Log::info('Starting file discovery', ['path' => $publicPath]);
+            
             if (File::exists($publicPath)) {
                 $files = File::allFiles($publicPath);
+                
+                \Log::info('Found files', ['count' => count($files)]);
                 
                 foreach ($files as $file) {
                     try {
                         $relativePath = str_replace($publicPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
                         $relativePath = str_replace('\\', '/', $relativePath);
                         
-                        // Skip .gitignore files
                         if (basename($relativePath) === '.gitignore') {
                             continue;
                         }
                         
-                        // Create User instance
-                        $userInstance = new User();
+                        // Create User instance for file data (using as dummy container)
+                        $userInstance = new \App\Models\User();
                         $userInstance->id = abs(crc32($relativePath));
                         $userInstance->name = $file->getFilename();
-                        $userInstance->email = $relativePath; // Store path in email
+                        $userInstance->email = $relativePath; // Store path in email field
                         $userInstance->created_at = Carbon::createFromTimestamp($file->getMTime());
                         $userInstance->updated_at = Carbon::createFromTimestamp($file->getMTime());
                         
-                        // Add custom attributes
+                        // Add custom attributes for file info
                         $userInstance->setAttribute('size', $file->getSize());
                         $userInstance->setAttribute('type', $file->getExtension());
-                        $userInstance->setAttribute('modified', Carbon::createFromTimestamp($file->getMTime()));
+                        $userInstance->setAttribute('path', $relativePath);
                         
                         // Mark as existing
                         $userInstance->exists = true;
@@ -75,39 +127,30 @@ class ListFileManager extends ListRecords
                         $storageFiles->push($userInstance);
                         
                     } catch (\Exception $e) {
-                        continue; // Skip problematic files
+                        \Log::warning('Error processing file', [
+                            'file' => $file->getPathname(),
+                            'error' => $e->getMessage()
+                        ]);
+                        continue;
                     }
                 }
             }
 
-            // Apply filters
-            $filteredFiles = $this->applyFilters($storageFiles);
+            \Log::info('File processing complete', ['total_files' => $storageFiles->count()]);
 
-            // Sort files
-            $sortColumn = $this->getTableSortColumn() ?? 'modified';
-            $sortDirection = $this->getTableSortDirection() ?? 'desc';
-            
-            $filteredFiles = $filteredFiles->sortBy(function ($file) use ($sortColumn) {
-                switch ($sortColumn) {
-                    case 'name':
-                        return $file->name;
-                    case 'size':
-                        return $file->getAttribute('size');
-                    case 'modified':
-                        return $file->getAttribute('modified');
-                    case 'type':
-                        return $file->getAttribute('type');
-                    default:
-                        return $file->getAttribute($sortColumn) ?? $file->{$sortColumn};
-                }
-            }, SORT_REGULAR, $sortDirection === 'desc');
-
-            // Paginate
-            $perPage = max(25, (int) $this->getTableRecordsPerPage());
+            // Simple pagination
+            $perPage = 25;
             $currentPage = max(1, (int) Paginator::resolveCurrentPage());
             $offset = ($currentPage - 1) * $perPage;
             
-            $items = $filteredFiles->slice($offset, $perPage)->values();
+            $items = $storageFiles->slice($offset, $perPage)->values();
+            
+            \Log::info('Pagination info', [
+                'current_page' => $currentPage,
+                'per_page' => $perPage,
+                'offset' => $offset,
+                'items_count' => $items->count()
+            ]);
             
             return new Paginator(
                 $items,
@@ -120,7 +163,11 @@ class ListFileManager extends ListRecords
             );
             
         } catch (\Exception $e) {
-            // Return empty paginator on error
+            \Log::error('Fatal error in getTableRecords', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return new Paginator(
                 collect(),
                 25,
@@ -131,58 +178,5 @@ class ListFileManager extends ListRecords
                 ]
             );
         }
-    }
-
-    protected function applyFilters($collection)
-    {
-        $filters = $this->getTableFilters();
-
-        // Filter by file type
-        if (isset($filters['type']) && $filters['type']['value']) {
-            $collection = $collection->filter(function ($file) use ($filters) {
-                return $file->getAttribute('type') === $filters['type']['value'];
-            });
-        }
-
-        return $collection;
-    }
-
-    protected function getStorageInfo(): string
-    {
-        $publicPath = storage_path('app/public');
-        $totalFiles = 0;
-        $totalSize = 0;
-
-        if (File::exists($publicPath)) {
-            $files = File::allFiles($publicPath);
-            $totalFiles = count($files);
-            
-            foreach ($files as $file) {
-                try {
-                    $totalSize += $file->getSize();
-                } catch (\Exception $e) {
-                    continue;
-                }
-            }
-        }
-
-        return "Total Files: $totalFiles | Total Size: " . $this->formatBytes($totalSize);
-    }
-
-    protected function formatBytes($bytes, $precision = 2)
-    {
-        if (!is_numeric($bytes) || $bytes <= 0) {
-            return '0 B';
-        }
-        
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $i = 0;
-
-        while ($bytes >= 1024 && $i < count($units) - 1) {
-            $bytes /= 1024;
-            $i++;
-        }
-
-        return round($bytes, $precision) . ' ' . $units[$i];
     }
 } 

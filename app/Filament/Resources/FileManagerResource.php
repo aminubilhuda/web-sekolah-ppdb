@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class FileManagerResource extends Resource
 {
-    protected static ?string $model = \App\Models\User::class; // Dummy model
+    protected static ?string $model = \App\Models\User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';
     protected static ?string $navigationLabel = 'File Manager';
@@ -32,14 +33,15 @@ class FileManagerResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(function () {
-                return \App\Models\User::query();
-            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama File')
                     ->searchable()
                     ->sortable(),
+                
+                Tables\Columns\TextColumn::make('email')
+                    ->label('Path')
+                    ->searchable(),
                 
                 Tables\Columns\TextColumn::make('type')
                     ->label('Tipe')
@@ -55,134 +57,145 @@ class FileManagerResource extends Resource
                 Tables\Columns\TextColumn::make('size')
                     ->label('Ukuran')
                     ->formatStateUsing(fn ($state) => $state ? self::formatBytes($state) : '0 B'),
-                
-                Tables\Columns\TextColumn::make('modified')
-                    ->label('Terakhir Diubah')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->label('Tipe File')
-                    ->options([
-                        'jpg' => 'JPG',
-                        'jpeg' => 'JPEG', 
-                        'png' => 'PNG',
-                        'pdf' => 'PDF',
-                        'doc' => 'DOC',
-                        'docx' => 'DOCX',
-                    ]),
-            ])
+            ->filters([])
             ->actions([
-                Tables\Actions\Action::make('view_url')
+                Tables\Actions\Action::make('test_action')
+                    ->label('Test')
+                    ->icon('heroicon-o-bug-ant')
+                    ->color('warning')
+                    ->action(function () {
+                        \Log::info('Test action called successfully!');
+                        
+                        \Filament\Notifications\Notification::make()
+                            ->title('Test Berhasil!')
+                            ->body('Action callback berhasil dipanggil! Sistem bekerja dengan baik.')
+                            ->success()
+                            ->send();
+                    }),
+                    
+                Tables\Actions\Action::make('view_file')
                     ->label('Lihat')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->url(fn ($record) => Storage::url($record->email ?? ''))
-                    ->openUrlInNewTab(),
-                
-                Tables\Actions\Action::make('download')
+                    ->url(fn ($record) => Storage::disk('public')->url($record->email ?? ''))
+                    ->openUrlInNewTab(true),
+                    
+                Tables\Actions\Action::make('download_direct')
                     ->label('Download')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
                     ->action(function ($record) {
-                        $filePath = $record->email; // Path stored in email field
-                        $fileName = $record->name;
+                        $filePath = $record->email ?? null;
+                        $fileName = $record->name ?? 'file';
                         
-                        if (!$filePath) {
-                            Notification::make()
-                                ->title('Error')
-                                ->body('File path tidak ditemukan')
-                                ->danger()
-                                ->send();
-                            return;
+                        if ($filePath) {
+                            $fullPath = storage_path('app/public/' . $filePath);
+                            if (file_exists($fullPath)) {
+                                \Log::info('Download action', ['file' => $fileName]);
+                                return response()->download($fullPath, $fileName);
+                            }
                         }
                         
-                        $fullPath = storage_path('app/public/' . $filePath);
-                        
-                        if (!file_exists($fullPath)) {
-                            Notification::make()
-                                ->title('File tidak ditemukan')
-                                ->body('File tidak dapat ditemukan di server')
-                                ->danger()
-                                ->send();
-                            return;
-                        }
-                        
-                        return response()->download($fullPath, $fileName);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Error')
+                            ->body('File tidak ditemukan')
+                            ->danger()
+                            ->send();
                     }),
-                
-                Tables\Actions\Action::make('delete')
+                    
+                Tables\Actions\Action::make('delete_direct')
                     ->label('Hapus')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus File')
-                    ->modalDescription(fn ($record) => 'Apakah Anda yakin ingin menghapus file "' . $record->name . '"?')
-                    ->action(function ($record) {
-                        $filePath = $record->email; // Path stored in email field
-                        $fileName = $record->name;
-                        
-                        if (!$filePath) {
-                            Notification::make()
-                                ->title('Error')
-                                ->body('File path tidak ditemukan')
-                                ->danger()
-                                ->send();
-                            return;
-                        }
-                        
-                        try {
-                            if (Storage::disk('public')->exists($filePath)) {
-                                Storage::disk('public')->delete($filePath);
-                                
-                                Notification::make()
-                                    ->title('Berhasil')
-                                    ->body('File "' . $fileName . '" berhasil dihapus')
-                                    ->success()
-                                    ->send();
-                                    
-                                return redirect()->route('filament.abdira.resources.file-managers.index');
-                            } else {
-                                Notification::make()
-                                    ->title('File tidak ditemukan')
-                                    ->body('File tidak dapat ditemukan')
-                                    ->warning()
-                                    ->send();
-                            }
-                        } catch (\Exception $e) {
-                            Notification::make()
-                                ->title('Error')
-                                ->body('Gagal menghapus file: ' . $e->getMessage())
-                                ->danger()
-                                ->send();
-                        }
-                    }),
+                    ->url(fn ($record) => route('file.delete', ['path' => urlencode($record->email ?? '')]))
+                    ->openUrlInNewTab(false)
+                    ->extraAttributes([
+                        'onclick' => 'return confirm("Apakah Anda yakin ingin menghapus file ini?")'
+                    ]),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('delete_selected')
+                Tables\Actions\BulkAction::make('delete_files')
                     ->label('Hapus Terpilih')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
+                    ->modalHeading('Hapus File Terpilih?')
+                    ->modalDescription('File yang dipilih akan dihapus permanen')
                     ->action(function ($records) {
+                        \Log::info('Bulk delete started', [
+                            'records_count' => count($records),
+                            'records' => $records->toArray()
+                        ]);
+                        
                         $deleted = 0;
+                        $errors = [];
+                        
                         foreach ($records as $record) {
-                            $filePath = $record->email;
-                            if ($filePath && Storage::disk('public')->exists($filePath)) {
-                                Storage::disk('public')->delete($filePath);
-                                $deleted++;
+                            try {
+                                $filePath = $record->email ?? null; // Use email field as path
+                                $fileName = $record->name ?? 'unknown';
+                                
+                                \Log::info('Processing file for delete', [
+                                    'file_name' => $fileName,
+                                    'file_path' => $filePath,
+                                    'record_email' => $record->email,
+                                    'record_name' => $record->name
+                                ]);
+                                
+                                if ($filePath && Storage::disk('public')->exists($filePath)) {
+                                    $result = Storage::disk('public')->delete($filePath);
+                                    if ($result) {
+                                        $deleted++;
+                                        \Log::info('File deleted successfully', ['file' => $fileName]);
+                                    } else {
+                                        $errors[] = "Gagal hapus: $fileName";
+                                        \Log::warning('Delete operation failed', ['file' => $fileName]);
+                                    }
+                                } else {
+                                    $errors[] = "File tidak ditemukan: $fileName";
+                                    \Log::warning('File not found', [
+                                        'file_path' => $filePath,
+                                        'exists' => Storage::disk('public')->exists($filePath ?? ''),
+                                        'public_path' => storage_path('app/public/' . $filePath)
+                                    ]);
+                                }
+                            } catch (\Exception $e) {
+                                $errors[] = "Error: {$e->getMessage()}";
+                                \Log::error('Error deleting file', [
+                                    'error' => $e->getMessage(),
+                                    'file' => $record->name ?? 'unknown'
+                                ]);
                             }
                         }
                         
-                        Notification::make()
-                            ->title('Berhasil')
-                            ->body("$deleted file berhasil dihapus")
-                            ->success()
-                            ->send();
+                        // Show detailed notification
+                        if ($deleted > 0) {
+                            Notification::make()
+                                ->title('Berhasil')
+                                ->body("$deleted file berhasil dihapus" . (count($errors) > 0 ? ". " . count($errors) . " file gagal." : ""))
+                                ->success()
+                                ->send();
+                        }
+                        
+                        if (count($errors) > 0) {
+                            Notification::make()
+                                ->title('Ada Error')
+                                ->body(implode(', ', array_slice($errors, 0, 3)) . (count($errors) > 3 ? '...' : ''))
+                                ->warning()
+                                ->send();
+                        }
+                        
+                        if ($deleted === 0 && count($errors) === 0) {
+                            Notification::make()
+                                ->title('Info')
+                                ->body('Tidak ada file yang dipilih atau ditemukan')
+                                ->info()
+                                ->send();
+                        }
                     }),
             ])
-            ->defaultSort('modified', 'desc')
+            ->defaultSort('name', 'asc')
             ->emptyStateHeading('Tidak ada file')
             ->emptyStateDescription('Belum ada file yang diupload')
             ->emptyStateIcon('heroicon-o-folder');

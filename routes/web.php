@@ -133,3 +133,44 @@ Route::prefix('fasilitas')->name('fasilitas.')->group(function () {
     Route::get('/', [FasilitasController::class, 'index'])->name('index');
     Route::get('/{slug}', [FasilitasController::class, 'show'])->name('show');
 });
+
+// File Manager download route
+Route::get('/file/download/{path}', function ($path) {
+    $decodedPath = urldecode($path);
+    $fullPath = storage_path('app/public/' . $decodedPath);
+    
+    if (file_exists($fullPath)) {
+        $fileName = basename($decodedPath);
+        return response()->download($fullPath, $fileName);
+    }
+    
+    return abort(404, 'File tidak ditemukan');
+})->name('file.download')->where('path', '.*');
+
+// File Manager delete route
+Route::get('/file/delete/{path}', function ($path) {
+    $decodedPath = urldecode($path);
+    $fileName = basename($decodedPath);
+    
+    try {
+        if (Storage::disk('public')->exists($decodedPath)) {
+            $result = Storage::disk('public')->delete($decodedPath);
+            
+            if ($result) {
+                \Log::info('File deleted via URL route', ['file' => $fileName]);
+                return redirect()->route('filament.abdira.resources.file-managers.index')
+                    ->with('success', "File '$fileName' berhasil dihapus");
+            } else {
+                return redirect()->route('filament.abdira.resources.file-managers.index')
+                    ->with('error', "Gagal menghapus file '$fileName'");
+            }
+        } else {
+            return redirect()->route('filament.abdira.resources.file-managers.index')
+                ->with('error', "File '$fileName' tidak ditemukan");
+        }
+    } catch (\Exception $e) {
+        \Log::error('Delete route error', ['error' => $e->getMessage(), 'file' => $fileName]);
+        return redirect()->route('filament.abdira.resources.file-managers.index')
+            ->with('error', "Error menghapus file: " . $e->getMessage());
+    }
+})->name('file.delete')->where('path', '.*');
