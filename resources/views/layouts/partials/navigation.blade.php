@@ -1,14 +1,19 @@
+@php
+    $isHomePage = request()->routeIs('web.home');
+@endphp
+
 <nav class="sticky top-0 left-0 right-0 z-50 transition-all duration-300" 
      x-data="{ 
          mobileMenuOpen: false, 
          scrolled: false,
+         isHomePage: {{ $isHomePage ? 'true' : 'false' }},
          init() {
              window.addEventListener('scroll', () => {
                  this.scrolled = window.scrollY > 100;
              });
          }
      }"
-     :class="scrolled ? 'fixed top-0 bg-primary-600 shadow-lg' : 'bg-transparent'">
+     :class="isHomePage ? (scrolled ? 'fixed top-0 bg-primary-600 shadow-lg' : 'bg-transparent') : 'bg-primary-600 shadow-lg'">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
@@ -103,7 +108,7 @@
          x-transition:leave="transition ease-in duration-75" 
          x-transition:leave-start="transform opacity-100 scale-100" 
          x-transition:leave-end="transform opacity-0 scale-95"
-         :class="scrolled ? 'bg-primary-600' : 'bg-primary-600 bg-opacity-95'">
+         :class="isHomePage ? (scrolled ? 'bg-primary-600' : 'bg-primary-600 bg-opacity-95') : 'bg-primary-600'">
         <div class="px-2 pt-2 pb-3 space-y-1">
             <a href="{{ route('web.home') }}" class="text-white hover:bg-white hover:bg-opacity-20 block px-3 py-2 rounded-md text-base font-medium transition-all duration-200">Beranda</a>
             
