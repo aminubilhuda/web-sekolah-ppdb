@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\ProfilSekolah;
 use Illuminate\Support\Facades\Storage;
 
 class InjectFavicon
@@ -14,7 +13,7 @@ class InjectFavicon
         $response = $next($request);
 
         if ($response->headers->get('content-type') === 'text/html') {
-            $profil = ProfilSekolah::first();
+            $profil = app('profil_sekolah');
             
             if ($profil && $profil->favicon) {
                 $faviconUrl = Storage::url($profil->favicon);

@@ -2,6 +2,7 @@
 
 @section('title', $berita->judul)
 @section('meta_description', Str::limit(strip_tags($berita->konten), 160))
+@section('og_type', 'article')
 
 @section('content')
     <!-- Hero Section with Parallax -->
@@ -175,5 +176,44 @@
             observer.observe(element);
         });
     });
+</script>
+@endpush
+
+@push('structured_data')
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": "{{ $berita->judul }}",
+    "description": "{{ Str::limit(strip_tags($berita->konten), 160) }}",
+    "author": {
+        "@type": "Organization",
+        "name": "{{ $profil ? $profil->nama_sekolah : config('app.name') }}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ $profil ? $profil->nama_sekolah : config('app.name') }}",
+        @if($profil && $profil->logo)
+        "logo": {
+            "@type": "ImageObject",
+            "url": "{{ asset('storage/' . $profil->logo) }}"
+        }
+        @endif
+    },
+    "datePublished": "{{ $berita->created_at->format('c') }}",
+    "dateModified": "{{ $berita->updated_at->format('c') }}",
+    @if($berita->image)
+    "image": {
+        "@type": "ImageObject",
+        "url": "{{ asset('storage/' . $berita->image) }}",
+        "width": 1200,
+        "height": 630
+    },
+    @endif
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ url()->current() }}"
+    }
+}
 </script>
 @endpush 

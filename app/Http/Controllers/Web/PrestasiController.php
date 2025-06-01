@@ -12,15 +12,18 @@ class PrestasiController extends Controller
     public function index()
     {
         $prestasis = Prestasi::with('kategori')
-            ->where('status', true)
+            ->where('is_published', true)
             ->latest()
             ->paginate(10);
         return view('web.prestasi.index', compact('prestasis'));
     }
 
-    public function show($id)
+    public function show($slug)
     {
-        $prestasi = Prestasi::with('kategori')->findOrFail($id);
+        $prestasi = Prestasi::with('kategori')
+            ->where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
         return view('web.prestasi.show', compact('prestasi'));
     }
 
@@ -29,7 +32,7 @@ class PrestasiController extends Controller
         $prestasis = Prestasi::whereHas('kategori', function($query) {
             $query->where('slug', 'akademik');
         })
-        ->where('status', true)
+        ->where('is_published', true)
         ->latest()
         ->paginate(10);
         
@@ -41,7 +44,7 @@ class PrestasiController extends Controller
         $prestasis = Prestasi::whereHas('kategori', function($query) {
             $query->where('slug', 'non-akademik');
         })
-        ->where('status', true)
+        ->where('is_published', true)
         ->latest()
         ->paginate(10);
         

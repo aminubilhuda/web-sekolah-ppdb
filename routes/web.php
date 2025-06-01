@@ -9,17 +9,16 @@ use App\Http\Controllers\Web\JurusanController;
 use App\Http\Controllers\Web\EkstrakurikulerController;
 use App\Http\Controllers\Web\AlumniController;
 use App\Http\Controllers\Web\GuruController;
-use App\Http\Controllers\Web\SiswaController;
 use App\Http\Controllers\Web\PPDBController;
 use App\Http\Controllers\Web\ContactController;
 use App\Http\Controllers\Web\GaleriController;
 use App\Http\Controllers\Web\PrestasiController;
 use App\Http\Controllers\Web\FaqController;
-use App\Http\Controllers\Web\DownloadController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Web\MitraIndustriController;
 use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\SitemapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +30,9 @@ use App\Http\Controllers\FasilitasController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// SEO Routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/', [HomeController::class, 'index'])->name('web.home');
 
@@ -72,10 +74,6 @@ Route::prefix('alumni')->name('web.alumni.')->group(function () {
 Route::get('/guru', [GuruController::class, 'index'])->name('web.guru.index');
 Route::get('/guru/{guru}', [GuruController::class, 'show'])->name('web.guru.show');
 
-// Siswa
-Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa');
-Route::get('/siswa/{id}', [SiswaController::class, 'show'])->name('siswa.show');
-
 // PPDB
 Route::prefix('ppdb')->name('web.ppdb.')->group(function () {
     Route::get('/', [PPDBController::class, 'index'])->name('index');
@@ -110,41 +108,10 @@ Route::prefix('prestasi')->name('web.prestasi.')->group(function () {
 // FAQ
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 
-// Download
-Route::prefix('download')->group(function () {
-    Route::get('/', [DownloadController::class, 'index'])->name('download');
-    Route::get('/formulir', [DownloadController::class, 'formulir'])->name('download.formulir');
-    Route::get('/dokumen', [DownloadController::class, 'dokumen'])->name('download.dokumen');
-});
-
-Route::get('/profil', [ProfilController::class, 'index'])->name('web.profil.index');
-
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-// Admin Routes
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    
-    // PPDB Management
-    Route::get('/ppdb', [App\Http\Controllers\Admin\PpdbController::class, 'index'])->name('ppdb.index');
-    Route::get('/ppdb/export', [App\Http\Controllers\Admin\PpdbController::class, 'export'])->name('ppdb.export');
-
-    // Guru Management
-    Route::prefix('guru')->name('guru.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Admin\GuruController::class, 'index'])->name('index');
-        Route::get('/create', [App\Http\Controllers\Admin\GuruController::class, 'create'])->name('create');
-        Route::post('/store', [App\Http\Controllers\Admin\GuruController::class, 'store'])->name('store');
-        Route::get('/{guru}/edit', [App\Http\Controllers\Admin\GuruController::class, 'edit'])->name('edit');
-        Route::put('/{guru}', [App\Http\Controllers\Admin\GuruController::class, 'update'])->name('update');
-        Route::delete('/{guru}', [App\Http\Controllers\Admin\GuruController::class, 'destroy'])->name('destroy');
-    });
-
-    // Mitra Industri Routes
-    Route::resource('mitra-industri', MitraIndustriController::class);
-});
 
 Route::get('/storage/{path}', function ($path) {
     $fullPath = storage_path('app/public/' . $path);

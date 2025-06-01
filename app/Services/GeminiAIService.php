@@ -125,7 +125,10 @@ class GeminiAIService
     public function generateBerita(array $params): ?string
     {
         $prompt = $this->buildBeritaPrompt($params);
-        return $this->generateContent($prompt);
+        $content = $this->generateContent($prompt);
+        
+        // Clean dan format HTML output
+        return $this->cleanHtmlOutput($content);
     }
 
     /**
@@ -134,7 +137,10 @@ class GeminiAIService
     public function generatePengumuman(array $params): ?string
     {
         $prompt = $this->buildPengumumanPrompt($params);
-        return $this->generateContent($prompt);
+        $content = $this->generateContent($prompt);
+        
+        // Clean dan format HTML output
+        return $this->cleanHtmlOutput($content);
     }
 
     /**
@@ -143,7 +149,10 @@ class GeminiAIService
     public function generateSambutanKepsek(array $params): ?string
     {
         $prompt = $this->buildSambutanPrompt($params);
-        return $this->generateContent($prompt);
+        $content = $this->generateContent($prompt);
+        
+        // Clean dan format HTML output
+        return $this->cleanHtmlOutput($content);
     }
 
     /**
@@ -159,10 +168,26 @@ class GeminiAIService
         return "
 Tulis artikel berita sekolah dalam bahasa Indonesia yang profesional dan menarik dengan detail berikut:
 
-**Judul**: {$judul}
-**Topik**: {$topik} 
-**Kategori**: {$kategori}
-**Tanggal**: {$tanggal}
+Judul: {$judul}
+Topik: {$topik} 
+Kategori: {$kategori}
+Tanggal: {$tanggal}
+
+PENTING - FORMAT OUTPUT:
+1. Gunakan HTML yang rapi dan terstruktur
+2. JANGAN gunakan tanda ** (double asterisk) sama sekali
+3. Gunakan tag HTML yang sesuai:
+   - <h2> untuk judul utama
+   - <h3> untuk sub judul
+   - <h4> untuk detail heading
+   - <p> untuk paragraf (selalu beri spasi antar paragraf)
+   - <strong> untuk emphasis/penekanan
+   - <em> untuk italic
+   - <ul><li> untuk bullet lists
+   - <ol><li> untuk numbered lists
+   - <blockquote><p> untuk kutipan
+4. Setiap paragraf harus dipisah dengan baris kosong
+5. Struktur HTML yang bersih dan readable
 
 Kriteria penulisan:
 1. Gaya bahasa formal namun mudah dipahami
@@ -175,7 +200,27 @@ Kriteria penulisan:
 
 Konteks: SMK Negeri dengan fokus pada prestasi akademik dan non-akademik siswa.
 
-Hasilkan artikel berita yang lengkap dan siap publish:
+Contoh format yang diinginkan:
+<h2>Judul Berita</h2>
+
+<p>Paragraf pembuka yang menarik dan informatif.</p>
+
+<h3>Sub Topik</h3>
+
+<p>Konten paragraf dengan informasi detail.</p>
+
+<ul>
+    <li>Poin penting pertama</li>
+    <li>Poin penting kedua</li>
+</ul>
+
+<blockquote>
+    <p>\"Kutipan yang relevan dan bermakna.\"</p>
+</blockquote>
+
+<p>Paragraf penutup dengan call-to-action.</p>
+
+Hasilkan artikel berita yang lengkap dengan HTML yang rapi:
         ";
     }
 
@@ -192,10 +237,26 @@ Hasilkan artikel berita yang lengkap dan siap publish:
         return "
 Tulis pengumuman sekolah dalam bahasa Indonesia yang jelas dan informatif dengan detail berikut:
 
-**Judul**: {$judul}
-**Topik**: {$topik}
-**Target**: {$target}
-**Tanggal**: {$tanggal}
+Judul: {$judul}
+Topik: {$topik}
+Target: {$target}
+Tanggal: {$tanggal}
+
+PENTING - FORMAT OUTPUT:
+1. Gunakan HTML yang rapi dan terstruktur
+2. JANGAN gunakan tanda ** (double asterisk) sama sekali
+3. Gunakan tag HTML yang sesuai:
+   - <h2> untuk judul utama
+   - <h3> untuk sub judul
+   - <h4> untuk detail heading
+   - <p> untuk paragraf (selalu beri spasi antar paragraf)
+   - <strong> untuk emphasis/penekanan
+   - <em> untuk italic
+   - <ul><li> untuk bullet lists
+   - <ol><li> untuk numbered lists
+   - <blockquote><p> untuk kutipan penting
+4. Setiap paragraf harus dipisah dengan baris kosong
+5. Struktur HTML yang bersih dan readable
 
 Kriteria penulisan:
 1. Bahasa resmi namun mudah dipahami
@@ -204,11 +265,33 @@ Kriteria penulisan:
 4. Sertakan deadline atau batas waktu jika ada
 5. Cantumkan kontak person untuk informasi lebih lanjut
 6. Gunakan format yang mudah dibaca
-7. Tegas dan langsung ke pointi
+7. Tegas dan langsung ke point
 
 Konteks: SMK Negeri dengan siswa dan guru yang aktif.
 
-Hasilkan pengumuman yang informatif dan actionable:
+Contoh format yang diinginkan:
+<h2>Judul Pengumuman</h2>
+
+<p>Paragraf pembuka yang jelas dan informatif.</p>
+
+<h3>Detail Informasi</h3>
+
+<ul>
+    <li>Waktu: [detail waktu]</li>
+    <li>Tempat: [detail tempat]</li>
+    <li>Peserta: [detail peserta]</li>
+</ul>
+
+<h4>Persyaratan</h4>
+
+<ol>
+    <li>Syarat pertama</li>
+    <li>Syarat kedua</li>
+</ol>
+
+<p>Informasi kontak: [detail kontak]</p>
+
+Hasilkan pengumuman yang informatif dan actionable dengan HTML yang rapi:
         ";
     }
 
@@ -225,10 +308,26 @@ Hasilkan pengumuman yang informatif dan actionable:
         return "
 Tulis sambutan kepala sekolah dalam bahasa Indonesia yang inspiratif dan memotivasi dengan detail berikut:
 
-**Acara**: {$acara}
-**Tema**: {$tema}
-**Audiens**: {$audiens}
-**Pesan Utama**: {$pesan_utama}
+Acara: {$acara}
+Tema: {$tema}
+Audiens: {$audiens}
+Pesan Utama: {$pesan_utama}
+
+PENTING - FORMAT OUTPUT:
+1. Gunakan HTML yang rapi dan terstruktur
+2. JANGAN gunakan tanda ** (double asterisk) sama sekali
+3. Gunakan tag HTML yang sesuai:
+   - <h2> untuk judul utama
+   - <h3> untuk sub judul
+   - <h4> untuk detail heading
+   - <p> untuk paragraf (selalu beri spasi antar paragraf)
+   - <strong> untuk emphasis/penekanan
+   - <em> untuk italic
+   - <ul><li> untuk bullet lists
+   - <ol><li> untuk numbered lists
+   - <blockquote><p> untuk kutipan inspiratif
+4. Setiap paragraf harus dipisah dengan baris kosong
+5. Struktur HTML yang bersih dan readable
 
 Kriteria penulisan:
 1. Tone inspiratif dan memotivasi
@@ -242,7 +341,26 @@ Kriteria penulisan:
 
 Konteks: Kepala Sekolah SMK Negeri yang peduli terhadap pendidikan dan masa depan siswa.
 
-Hasilkan sambutan yang menginspirasi dan bermakna:
+Contoh format yang diinginkan:
+<h2>Sambutan Kepala Sekolah</h2>
+
+<p>Assalamualaikum warahmatullahi wabarakatuh.</p>
+
+<p>Paragraf pembuka dengan apresiasi dan salam hangat.</p>
+
+<h3>Tema Utama</h3>
+
+<p>Paragraf tentang tema atau topik utama sambutan.</p>
+
+<blockquote>
+    <p>\"Kutipan inspiratif atau motivasi.\"</p>
+</blockquote>
+
+<p>Paragraf berisi harapan dan doa untuk masa depan.</p>
+
+<p>Wassalamualaikum warahmatullahi wabarakatuh.</p>
+
+Hasilkan sambutan yang menginspirasi dan bermakna dengan HTML yang rapi:
         ";
     }
 
@@ -308,5 +426,41 @@ Hasilkan sambutan yang menginspirasi dan bermakna:
         ];
 
         return $modelInfo[$model] ?? $modelInfo['gemini-2.0-flash'];
+    }
+
+    /**
+     * Clean dan format HTML output dari AI
+     */
+    private function cleanHtmlOutput(?string $content): ?string
+    {
+        if (!$content) {
+            return null;
+        }
+
+        // Hapus tanda ** (double asterisk) yang mungkin masih ada
+        $content = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $content);
+        
+        // Hapus tanda * (single asterisk) untuk italic
+        $content = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $content);
+        
+        // Pastikan ada spasi setelah tag penutup paragraf
+        $content = str_replace('</p>', "</p>\n\n", $content);
+        
+        // Pastikan ada spasi setelah tag penutup heading
+        $content = str_replace(['</h2>', '</h3>', '</h4>'], ["</h2>\n\n", "</h3>\n\n", "</h4>\n\n"], $content);
+        
+        // Pastikan ada spasi setelah list
+        $content = str_replace(['</ul>', '</ol>'], ["</ul>\n\n", "</ol>\n\n"], $content);
+        
+        // Pastikan ada spasi setelah blockquote
+        $content = str_replace('</blockquote>', "</blockquote>\n\n", $content);
+        
+        // Hapus triple atau lebih spasi/newlines berturut-turut
+        $content = preg_replace('/\n{3,}/', "\n\n", $content);
+        
+        // Trim whitespace di awal dan akhir
+        $content = trim($content);
+        
+        return $content;
     }
 } 

@@ -11,8 +11,7 @@ class JurusanController extends Controller
     public function index()
     {
         $jurusans = Jurusan::with('kepalaJurusan')->get();
-        $profilSekolah = \App\Models\ProfilSekolah::first();
-        return view('web.jurusan.index', compact('jurusans', 'profilSekolah'));
+        return view('web.jurusan.index', compact('jurusans'));
     }
 
     public function show(Jurusan $jurusan)

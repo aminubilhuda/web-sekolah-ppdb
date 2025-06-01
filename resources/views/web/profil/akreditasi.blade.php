@@ -25,7 +25,11 @@
                         </div>
                         <h2 class="text-2xl font-semibold text-gray-900 mb-4">Status Akreditasi</h2>
                         <div class="inline-block px-8 py-4 rounded-full bg-primary-600 text-white text-5xl font-bold mb-6 transform hover:scale-110 transition-transform duration-300">
-                            {{ strtoupper($profil->status_akreditasi ?? '-') }}
+                            @if($profil && $profil->status_akreditasi)
+                                {{ strtoupper($profil->status_akreditasi) }}
+                            @else
+                                -
+                            @endif
                         </div>
                         <p class="text-gray-600">Berdasarkan penilaian Badan Akreditasi Nasional Sekolah/Madrasah (BAN-S/M)</p>
                     </div>

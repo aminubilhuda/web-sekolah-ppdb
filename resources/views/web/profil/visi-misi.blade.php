@@ -16,7 +16,11 @@
                 <div class="card-body">
                     <h2 class="h4 mb-3">Visi</h2>
                     <p class="mb-0">
-                        {{ $profil->visi ?? 'Visi sekolah belum tersedia' }}
+                        @if($profil && $profil->visi)
+                            {{ $profil->visi }}
+                        @else
+                            Visi sekolah sedang dalam proses penyusunan.
+                        @endif
                     </p>
                 </div>
             </div>
@@ -24,9 +28,13 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="h4 mb-3">Misi</h2>
-                    <p class="mb-0">
-                        {{ $profil->misi ?? 'Misi sekolah belum tersedia' }}
-                    </p>
+                    <div class="mb-0">
+                        @if($profil && $profil->misi)
+                            {!! $profil->misi !!}
+                        @else
+                            <p>Misi sekolah sedang dalam proses penyusunan.</p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

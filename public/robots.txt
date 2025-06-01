@@ -1,2 +1,5 @@
 User-agent: *
 Disallow:
+
+# Sitemap
+Sitemap: http://localhost/sitemap.xml

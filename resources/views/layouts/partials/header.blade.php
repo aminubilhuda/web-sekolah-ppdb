@@ -1,78 +1,80 @@
-<header class="bg-white shadow-sm flex items-center">
-    <div class="container mx-auto px-4 py-1 h-8">
+<header class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 shadow-lg">
+    <div class="container mx-auto px-4 py-2">
         <div class="flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex-shrink-0 hidden md:flex items-center space-x-3">
-                 <div class="flex items-center">
-                    <div class="h-3 w-auto">
-                        <p class="text-xs text-gray-600">Telp : {{ $profil->no_hp ?? '(021) 1234567' }}</p>
-                    </div>
+            <!-- Contact Information -->
+            <div class="flex-shrink-0 hidden lg:flex items-center space-x-4">
+                <div class="flex items-center space-x-2 text-white/90 hover:text-white transition-all duration-300">
+                    <i class="fas fa-phone-alt text-xs"></i>
+                    <span class="text-xs font-normal">{{ $profil->no_hp ?? '(021) 1234567' }}</span>
                 </div>
-                <div class="flex items-center">
-                    <div class="h-3 w-auto">
-                        <p class="text-xs text-gray-600">Email : {{ $profil->email ?? 'info@sekolah.sch.id' }}</p>
-                    </div>
+                <div class="w-px h-4 bg-white/30"></div>
+                <div class="flex items-center space-x-2 text-white/90 hover:text-white transition-all duration-300">
+                    <i class="fas fa-envelope text-xs"></i>
+                    <span class="text-xs font-normal">{{ $profil->email ?? 'info@sekolah.sch.id' }}</span>
                 </div>
-                {{-- <a href="{{ route('web.home') }}" class="flex items-center">
-                    <img src="{{ $profil && $profil->logo ? asset('storage/' . $profil->logo) : asset('images/logo.png') }}" alt="{{ config('app.name') }}" width="100" height="100" class="h-8 w-auto">
-                    <div class="ml-2">
-                        <h1 class="text-base font-bold text-gray-900 h-3 w-auto">
-                            <span class="text-sm font-normal text-gray-600"> {{ $nama_sekolah }}</span></h1>
-                    </div>
-                </a> --}}
             </div>
 
-            <!-- Contact Info -->
-            {{-- <div class="hidden md:flex items-center space-x-3">
-                <div class="flex items-cente">
-                    <div class="h-3 w-auto">
-                        <p class="text-xs text-gray-600">{{ $profil->no_hp ?? '(021) 1234567' }}</p>
-                    </div>
+            <!-- Mobile Contact Info -->
+            <div class="flex lg:hidden items-center">
+                <div class="text-white text-xs font-normal">
+                    <i class="fas fa-phone-alt mr-1"></i>
+                    {{ $profil->no_hp ?? '(021) 1234567' }}
                 </div>
-                <div class="flex items-center">
-                    <div class="h-3 w-auto">
-                        <p class="text-xs text-gray-600">{{ $profil->email ?? 'info@sekolah.sch.id' }}</p>
-                    </div>
-                </div>
-            </div> --}}
+            </div>
 
             <!-- Social Media Icons -->
-            <div class="hidden md:flex items-center space-x-4">
-                @if($profil && $profil->facebook)
-                <a href="{{ $profil->facebook }}" target="_blank" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                    <i class="fab fa-facebook-f text-lg"></i>
-                </a>
-                @endif
-                @if($profil && $profil->instagram)
-                <a href="{{ $profil->instagram }}" target="_blank" class="text-gray-600 hover:text-pink-600 transition-colors duration-200">
-                    <i class="fab fa-instagram text-lg"></i>
-                </a>
-                @endif
-                @if($profil && $profil->twitter)
-                <a href="{{ $profil->twitter }}" target="_blank" class="text-gray-600 hover:text-blue-400 transition-colors duration-200">
-                    <i class="fab fa-twitter text-lg"></i>
-                </a>
-                @endif
-                @if($profil && $profil->youtube)
-                <a href="{{ $profil->youtube }}" target="_blank" class="text-gray-600 hover:text-red-600 transition-colors duration-200">
-                    <i class="fab fa-youtube text-lg"></i>
-                </a>
-                @endif
-                @if($profil && $profil->tiktok)
-                <a href="{{ $profil->tiktok }}" target="_blank" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                    <i class="fab fa-tiktok text-lg"></i>
-                </a>
-                @endif
-                @if($profil && $profil->whatsapp)
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $profil->whatsapp) }}" target="_blank" class="text-gray-600 hover:text-green-600 transition-colors duration-200">
-                    <i class="fab fa-whatsapp text-lg"></i>
-                </a>
-                @endif
-                @if($profil && $profil->telegram)
-                <a href="{{ $profil->telegram }}" target="_blank" class="text-gray-600 hover:text-blue-500 transition-colors duration-200">
-                    <i class="fab fa-telegram text-lg"></i>
-                </a>
-                @endif
+            <div class="flex items-center space-x-2">
+                <span class="hidden md:block text-white/80 text-xs font-normal mr-1">Ikuti Kami:</span>
+                <div class="flex items-center space-x-1">
+                    @if($profil && $profil->facebook)
+                    <a href="{{ $profil->facebook }}" target="_blank" 
+                       class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-blue-600 hover:scale-110 transition-all duration-300 hover:shadow-lg">
+                        <i class="fab fa-facebook-f text-xs"></i>
+                    </a>
+                    @endif
+                    
+                    @if($profil && $profil->instagram)
+                    <a href="{{ $profil->instagram }}" target="_blank" 
+                       class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-500 hover:scale-110 transition-all duration-300 hover:shadow-lg">
+                        <i class="fab fa-instagram text-xs"></i>
+                    </a>
+                    @endif
+                    
+                    @if($profil && $profil->twitter)
+                    <a href="{{ $profil->twitter }}" target="_blank" 
+                       class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-blue-400 hover:scale-110 transition-all duration-300 hover:shadow-lg">
+                        <i class="fab fa-twitter text-xs"></i>
+                    </a>
+                    @endif
+                    
+                    @if($profil && $profil->youtube)
+                    <a href="{{ $profil->youtube }}" target="_blank" 
+                       class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-red-600 hover:scale-110 transition-all duration-300 hover:shadow-lg">
+                        <i class="fab fa-youtube text-xs"></i>
+                    </a>
+                    @endif
+                    
+                    @if($profil && $profil->tiktok)
+                    <a href="{{ $profil->tiktok }}" target="_blank" 
+                       class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-gray-800 hover:scale-110 transition-all duration-300 hover:shadow-lg">
+                        <i class="fab fa-tiktok text-xs"></i>
+                    </a>
+                    @endif
+                    
+                    @if($profil && $profil->whatsapp)
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $profil->whatsapp) }}" target="_blank" 
+                       class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-green-500 hover:scale-110 transition-all duration-300 hover:shadow-lg">
+                        <i class="fab fa-whatsapp text-xs"></i>
+                    </a>
+                    @endif
+                    
+                    @if($profil && $profil->telegram)
+                    <a href="{{ $profil->telegram }}" target="_blank" 
+                       class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-blue-500 hover:scale-110 transition-all duration-300 hover:shadow-lg">
+                        <i class="fab fa-telegram text-xs"></i>
+                    </a>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

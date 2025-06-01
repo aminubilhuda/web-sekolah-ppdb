@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProfilSekolah;
+use App\Services\CacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +18,7 @@ class ProfilSekolahController extends Controller
     {
         try {
             Log::info('Mencoba mengambil data profil sekolah');
-            $profil = ProfilSekolah::first();
+            $profil = CacheService::getProfilSekolah();
             
             if (!$profil) {
                 Log::warning('Data profil sekolah tidak ditemukan');

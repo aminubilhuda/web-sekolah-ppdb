@@ -12,10 +12,6 @@ use App\Http\Controllers\Api\GuruController;
 use App\Http\Controllers\Api\SiswaController;
 use App\Http\Controllers\Api\PpdbController;
 use App\Http\Controllers\Api\GaleriController;
-use App\Http\Controllers\Api\PrestasiController;
-use App\Http\Controllers\Api\FaqController;
-use App\Http\Controllers\Api\DownloadController;
-use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\Lk3Controller;
 use App\Http\Controllers\Api\GeminiController;
 
@@ -68,22 +64,6 @@ Route::middleware('api')->group(function () {
     Route::apiResource('galeri', GaleriController::class);
     Route::get('/galeri/foto', [GaleriController::class, 'foto']);
     Route::get('/galeri/video', [GaleriController::class, 'video']);
-    
-    // Prestasi CRUD
-    Route::apiResource('prestasi', PrestasiController::class);
-    Route::get('/prestasi/akademik', [PrestasiController::class, 'akademik']);
-    Route::get('/prestasi/non-akademik', [PrestasiController::class, 'nonAkademik']);
-    
-    // FAQ CRUD
-    Route::apiResource('faq', FaqController::class);
-    
-    // Download CRUD
-    Route::apiResource('download', DownloadController::class);
-    Route::get('/download/formulir', [DownloadController::class, 'formulir']);
-    Route::get('/download/dokumen', [DownloadController::class, 'dokumen']);
-    
-    // Contact
-    Route::post('/contact', [ContactController::class, 'store']);
     
     // LK3 CRUD
     Route::apiResource('lk3', Lk3Controller::class);

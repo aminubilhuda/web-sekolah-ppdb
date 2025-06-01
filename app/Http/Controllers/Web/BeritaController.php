@@ -18,7 +18,8 @@ class BeritaController extends Controller
         DB::enableQueryLog();
 
         $berita = Berita::with('kategori')
-            ->where('status', 'published')
+            ->where('is_published', true)
+            ->where('published_at', '<=', now())
             ->latest()
             ->paginate(9);
 
@@ -36,11 +37,13 @@ class BeritaController extends Controller
     {
         $berita = Berita::with('kategori')
             ->where('slug', $slug)
-            ->where('status', 'published')
+            ->where('is_published', true)
+            ->where('published_at', '<=', now())
             ->firstOrFail();
 
         $beritaTerbaru = Berita::with('kategori')
-            ->where('status', 'published')
+            ->where('is_published', true)
+            ->where('published_at', '<=', now())
             ->where('id', '!=', $berita->id)
             ->latest()
             ->take(3)

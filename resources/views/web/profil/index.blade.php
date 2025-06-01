@@ -22,7 +22,11 @@
         <div class="bg-white rounded-lg shadow-md p-8 mb-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-6">Sejarah</h2>
             <div class="prose max-w-none">
-                {!! $profil->sejarah !!}
+                @if($profil && $profil->sejarah)
+                    {!! $profil->sejarah !!}
+                @else
+                    <p class="text-gray-600">Sejarah sekolah sedang dalam proses penyusunan.</p>
+                @endif
             </div>
         </div>
 
@@ -31,13 +35,21 @@
             <div class="bg-white rounded-lg shadow-md p-8">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Visi</h2>
                 <div class="prose max-w-none">
-                    <p>{{ $profil->visi }}</p>
+                    @if($profil && $profil->visi)
+                        <p>{{ $profil->visi }}</p>
+                    @else
+                        <p class="text-gray-600">Visi sekolah sedang dalam proses penyusunan.</p>
+                    @endif
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow-md p-8">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Misi</h2>
                 <div class="prose max-w-none">
-                    {!! $profil->misi !!}
+                    @if($profil && $profil->misi)
+                        {!! $profil->misi !!}
+                    @else
+                        <p class="text-gray-600">Misi sekolah sedang dalam proses penyusunan.</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -77,20 +89,29 @@
         </div>
 
         <!-- Fasilitas Section -->
+        @if($fasilitas && count($fasilitas) > 0)
         <div class="bg-white rounded-lg shadow-md p-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-6">Fasilitas</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($fasilitas as $fasil)
                 <div class="bg-gray-50 rounded-lg overflow-hidden">
-                    <img src="{{ asset($fasil->image) }}" alt="{{ $fasil->nama }}" class="w-full h-48 object-cover">
+                    <img src="{{ $fasil->image ? asset('storage/' . $fasil->image) : asset('images/default-facility.jpg') }}" alt="{{ $fasil->nama }}" class="w-full h-48 object-cover">
                     <div class="p-4">
                         <h3 class="text-lg font-semibold mb-2">{{ $fasil->nama }}</h3>
-                        <p class="text-gray-600">{{ $fasil->deskripsi }}</p>
+                        <p class="text-gray-600">{{ $fasil->deskripsi ?? 'Deskripsi fasilitas belum tersedia' }}</p>
                     </div>
                 </div>
                 @endforeach
             </div>
         </div>
+        @else
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Fasilitas</h2>
+            <div class="text-center py-8">
+                <p class="text-gray-600">Data fasilitas sedang dalam proses pengunggahan.</p>
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 @endsection

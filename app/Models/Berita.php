@@ -22,13 +22,13 @@ class Berita extends Model
         'kategori_id',
         'konten',
         'image',
-        'status',
+        'is_published',
         'published_at',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
-        'status' => 'string',
+        'is_published' => 'boolean',
     ];
 
     public function kategori()
@@ -52,7 +52,7 @@ class Berita extends Model
     public static function getCachedActive()
     {
         return Cache::remember('berita_active', 3600, function () {
-            return self::where('status', 'published')
+            return self::where('is_published', true)
                 ->where('published_at', '<=', now())
                 ->with(['kategori'])
                 ->get();
@@ -63,7 +63,7 @@ class Berita extends Model
     {
         return Cache::remember("berita_kategori_{$kategoriId}", 3600, function () use ($kategoriId) {
             return self::where('kategori_id', $kategoriId)
-                ->where('status', 'published')
+                ->where('is_published', true)
                 ->where('published_at', '<=', now())
                 ->with(['kategori'])
                 ->get();
@@ -74,7 +74,7 @@ class Berita extends Model
     {
         return Cache::remember("berita_slug_{$slug}", 3600, function () use ($slug) {
             return self::where('slug', $slug)
-                ->where('status', 'published')
+                ->where('is_published', true)
                 ->where('published_at', '<=', now())
                 ->with(['kategori'])
                 ->first();

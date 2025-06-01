@@ -173,20 +173,41 @@ class BeritaResource extends Resource
                                         ->toArray();
                                 });
                             }),
-                        Forms\Components\Select::make('status')
+                        Forms\Components\Select::make('is_published')
+                            ->label('Status Publikasi')
                             ->required()
                             ->options([
-                                'draft' => 'Draft',
-                                'published' => 'Published',
+                                false => 'Draft',
+                                true => 'Published',
                             ])
-                            ->default('draft'),
+                            ->default(false),
                         Forms\Components\DateTimePicker::make('published_at')
                             ->label('Tanggal Publish')
                             ->default(now()),
-                        Forms\Components\Textarea::make('konten')
+                        Forms\Components\RichEditor::make('konten')
+                            ->label('Konten Berita')
                             ->required()
-                            ->maxLength(65535)
-                            ->rows(10)
+                            ->toolbarButtons([
+                                'attachFiles',
+                                'blockquote',
+                                'bold',
+                                'bulletList',
+                                'codeBlock',
+                                'h2',
+                                'h3',
+                                'h4',
+                                'italic',
+                                'link',
+                                'orderedList',
+                                'redo',
+                                'strike',
+                                'underline',
+                                'undo',
+                            ])
+                            ->placeholder('Tulis konten berita di sini... Anda juga bisa menggunakan AI Writer untuk generate konten otomatis.')
+                            ->helperText('💡 Tips: Gunakan heading (H2, H3, H4) untuk struktur artikel yang baik. Format teks dengan bold/italic untuk emphasis. Gunakan blockquote untuk kutipan penting.')
+                            ->fileAttachmentsDirectory('berita/attachments')
+                            ->fileAttachmentsVisibility('public')
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make('image')
                             ->label('Gambar')
@@ -216,12 +237,11 @@ class BeritaResource extends Resource
                 Tables\Columns\TextColumn::make('kategori.nama')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\TextColumn::make('is_published')
+                    ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'gray',
-                        'published' => 'success',
-                    }),
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Published' : 'Draft')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('published_at')
                     ->label('Tanggal Publish')
                     ->dateTime()
@@ -238,10 +258,10 @@ class BeritaResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('kategori_id')
                     ->relationship('kategori', 'nama'),
-                Tables\Filters\SelectFilter::make('status')
+                Tables\Filters\SelectFilter::make('is_published')
                     ->options([
-                        'draft' => 'Draft',
-                        'published' => 'Published',
+                        false => 'Draft',
+                        true => 'Published',
                     ]),
             ])
             ->actions([

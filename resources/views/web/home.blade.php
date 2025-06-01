@@ -7,8 +7,22 @@
     <!-- Link Swiper's CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* Modal Styles */
-        .modal {
+        /* Global Variables */
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-xl: 0 35px 60px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Modal Banner Highlight Styles */
+        .banner-modal {
             display: none;
             position: fixed;
             z-index: 9999;
@@ -16,583 +30,862 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
         }
 
-        .modal-content {
+        .banner-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .banner-modal-content {
             position: relative;
-            background-color: white;
-            margin: 0;
-            padding: 1rem;
-            width: 70%;
-            max-width: 600px;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            animation: modalFadeIn 0.3s ease-out;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: scaleIn 0.3s ease-out;
+            margin: auto;
+        }
+
+        .banner-modal-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 80vh;
+            object-fit: contain;
+            transition: opacity 0.3s ease;
+        }
+
+        .banner-modal-image.loading {
+            opacity: 0.5;
+        }
+
+        .banner-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            z-index: 10001;
+        }
+
+        .banner-modal-close:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        .banner-modal-loading {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -60%);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%);
-            }
-        }
-
-        .close-modal {
-            position: absolute;
-            right: -1.5rem;
-            top: -1.5rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #fff;
-            cursor: pointer;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.5);
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .close-modal:hover {
+            color: white;
             background: rgba(0, 0, 0, 0.7);
-            transform: rotate(90deg);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 14px;
         }
 
-        .modal-image {
-            width: 100%;
-            height: auto;
-            max-height: 70vh;
-            object-fit: contain;
-            border-radius: 0.5rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        /* Hero Slider Styles */
-        .hero-slider {
+        @keyframes scaleIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.8) translate(-50%, -50%);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1) translate(-50%, -50%);
+            }
+        }
+
+        /* Responsive Design untuk Modal */
+        @media (max-width: 768px) {
+            .banner-modal-content {
+                max-width: 95vw;
+                max-height: 85vh;
+                border-radius: 15px;
+            }
+
+            .banner-modal.show {
+                padding: 10px;
+            }
+
+            .banner-modal-close {
+                top: 10px;
+                right: 10px;
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .banner-modal-content {
+                max-width: 98vw;
+                max-height: 80vh;
+                border-radius: 10px;
+            }
+
+            .banner-modal.show {
+                padding: 5px;
+            }
+        }
+
+        /* Hero Section */
+        .hero-section {
             position: relative;
             height: 100vh;
-            background: #000;
+            background: var(--gradient-1);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            margin-top: -64px; /* Negative margin untuk mengkompensasi header */
         }
 
-        .hero-slider::after {
-            content: '';
+        /* Ketika navbar menjadi fixed, hero section perlu menyesuaikan */
+        .hero-section-scrolled {
+            margin-top: 0;
+        }
+
+        .hero-background {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 200px;
-            background: linear-gradient(to bottom, 
-                rgba(37, 99, 235, 0.5) 0%,
-                rgba(37, 99, 235, 0.4) 20%,
-                rgba(37, 99, 235, 0.3) 40%,
-                rgba(37, 99, 235, 0.2) 60%,
-                rgba(37, 99, 235, 0.1) 80%,
-                transparent 100%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .hero-slider::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 300px;
-            background: linear-gradient(135deg,
-                rgba(37, 99, 235, 0.2) 0%,
-                rgba(59, 130, 246, 0.2) 50%,
-                rgba(37, 99, 235, 0.2) 100%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .swiper {
             width: 100%;
             height: 100%;
+            opacity: 0.1;
+        }
+
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        .hero-blob {
+            position: absolute;
+            border-radius: 50%;
+            mix-blend-mode: multiply;
+            filter: blur(40px);
+            animation: blob 7s infinite;
+        }
+
+        .hero-blob:nth-child(1) {
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 300px;
+            background: rgba(59, 130, 246, 0.3);
+            animation-delay: 0s;
+        }
+
+        .hero-blob:nth-child(2) {
+            top: 50%;
+            right: 0;
+            width: 250px;
+            height: 250px;
+            background: rgba(16, 185, 129, 0.3);
+            animation-delay: 2s;
+        }
+
+        .hero-blob:nth-child(3) {
+            bottom: 0;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(245, 87, 108, 0.3);
+            animation-delay: 4s;
+        }
+
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 20;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+            opacity: 0;
+            animation: slideInUp 1s ease-out 0.5s forwards;
+            position: relative;
+            z-index: 21;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            animation: slideInUp 1s ease-out 0.8s forwards;
+            position: relative;
+            z-index: 21;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: slideInUp 1s ease-out 1.1s forwards;
+            position: relative;
+            z-index: 21;
+        }
+
+        .btn-hero {
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-hero-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-hero-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-hero-secondary:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Slider Styles untuk Hero */
+        .hero-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
 
         .swiper-slide {
             position: relative;
-            overflow: hidden;
             height: 100vh;
         }
 
-        .swiper-slide img {
+        .slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transform: scale(1.1);
-            transition: transform 1.5s ease;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
-        .swiper-slide-active img {
-            transform: scale(1);
+        .slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .slide-content {
             position: absolute;
-            left: 0;
             top: 50%;
-            transform: translateY(-50%) translateX(-50px);
-            padding: 4rem;
-            max-width: 600px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
             color: white;
-            opacity: 0;
-            transition: all 0.8s ease;
-            z-index: 2;
+            z-index: 20;
+            width: 90%;
+            max-width: 800px;
         }
 
-        .swiper-slide-active .slide-content {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
-
-        .slide-content h2 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            opacity: 0;
-            transition: all 0.8s ease 0.2s;
-        }
-
-        .swiper-slide-active .slide-content h2 {
-            opacity: 1;
-        }
-
-        .slide-content p {
-            font-size: 1.25rem;
-            max-width: 500px;
-            margin-bottom: 2rem;
-            color: #ffffff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            opacity: 0;
-            transition: all 0.8s ease 0.4s;
-        }
-
-        .swiper-slide-active .slide-content p {
-            opacity: 1;
-        }
-
-        .slide-content .cta-button {
-            opacity: 0;
-            transition: all 0.8s ease 0.6s;
-            background: #ffffff;
-            color: #2563EB;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            display: inline-block;
-            text-decoration: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .swiper-slide-active .slide-content .cta-button {
-            opacity: 1;
-        }
-
-        .slide-content .cta-button:hover {
-            background: #f8fafc;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        }
-
-        .swiper-slide::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to right, 
-                rgba(0,0,0,0.9) 0%,
-                rgba(0,0,0,0.7) 30%,
-                rgba(0,0,0,0.5) 50%,
-                rgba(0,0,0,0.3) 70%,
-                rgba(0,0,0,0.1) 100%);
-            z-index: 1;
-        }
-
-        .swiper-button-next,
-        .swiper-button-prev {
-            color: white;
-            background: rgba(255,255,255,0.1);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .swiper-button-next:hover,
-        .swiper-button-prev:hover {
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.1);
-        }
-
-        .swiper-pagination-bullet {
-            width: 12px;
-            height: 12px;
-            background: white;
-            opacity: 0.5;
-            transition: all 0.3s ease;
-        }
-
-        .swiper-pagination-bullet-active {
-            opacity: 1;
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-            transform: scale(1.2);
-        }
-
-        /* Decorative Elements */
-        .decorative-wave {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 150px;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%232563EB' fill-opacity='0.1' d='M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-            background-size: cover;
-            background-position: center;
-            transform: rotate(180deg);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .decorative-dots {
-            position: absolute;
-            top: 50px;
-            left: 0;
-            right: 0;
-            height: 100px;
-            background: 
-                radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.2) 1px, transparent 1px),
-                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.2) 1px, transparent 1px);
-            background-size: 30px 30px;
-            opacity: 0.5;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .decorative-lines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100px;
-            background: 
-                linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.1) 50%, transparent 100%),
-                linear-gradient(180deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, transparent 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* Features Section with Decorative Elements */
-        .features-section {
-            position: relative;
+        /* Stats Section */
+        .stats-section {
             padding: 6rem 0;
-            background: linear-gradient(to bottom, #f8fafc, #ffffff);
-            overflow: hidden;
-        }
-
-        .features-section::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            left: 0;
-            right: 0;
-            height: 200px;
-            background: linear-gradient(to bottom, 
-                rgba(37, 99, 235, 0.05) 0%,
-                rgba(37, 99, 235, 0.02) 50%,
-                transparent 100%);
-            z-index: 1;
-        }
-
-        .features-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 L60 0 L60 60 L0 60 Z' fill='none' stroke='%232563EB' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E") repeat;
-            opacity: 0.1;
-            z-index: 0;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 20px;
-            padding: 2.5rem;
+            background: var(--light-color);
             position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
-            border: 1px solid rgba(37, 99, 235, 0.1);
+            z-index: 40;
         }
 
-        .feature-card::before {
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative !important;
+            z-index: 999997 !important;
+            transform: translateZ(0);
+            isolation: isolate;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 3.5rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative !important;
+            overflow: visible;
+            z-index: 999998 !important;
+            transform: translateZ(0);
+            isolation: isolate;
+        }
+
+        .stat-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            z-index: 51;
         }
 
-        .feature-card:hover {
+        .stat-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.1);
+            box-shadow: var(--shadow-lg);
+            z-index: 55;
         }
 
-        .feature-card:hover::before {
-            opacity: 1;
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            position: relative !important;
+            z-index: 999999 !important;
+            transform: translateZ(0);
+            isolation: isolate;
+            display: block;
+            line-height: 1.1;
+            text-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+            min-height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            font-weight: 600;
+            position: relative !important;
+            z-index: 999999 !important;
+            transform: translateZ(0);
+            isolation: isolate;
+            display: block;
+            line-height: 1.3;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 8rem 0;
+            background: white;
+            position: relative;
+        }
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        .about-content h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--dark-color);
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+
+        .about-content .highlight {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .about-content p {
+            font-size: 1.2rem;
+            color: #6b7280;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .about-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+            width: 30px;
+            height: 30px;
+            color: white;
+        }
+
+        .feature-text {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 25px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .image-card {
+            position: absolute;
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            max-width: 200px;
+        }
+
+        .image-card-1 {
+            top: -20px;
+            left: -20px;
+            background: var(--gradient-2);
+            color: white;
+        }
+
+        .image-card-2 {
+            bottom: -20px;
+            right: -20px;
+            background: var(--gradient-3);
+            color: white;
+        }
+
+        /* Programs Section */
+        .programs-section {
+            padding: 8rem 0;
+            background: var(--light-color);
+        }
+
+        .programs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 6rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+        }
+
+        .program-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .program-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .program-header {
+            padding: 2.5rem;
+            background: var(--gradient-1);
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .program-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
-            transform: rotate(-10deg);
-            transition: transform 0.4s ease;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+            margin: 0 auto 2rem;
         }
 
-        .feature-card:hover .feature-icon {
-            transform: rotate(0deg) scale(1.1);
-        }
-
-        .feature-icon svg {
+        .program-icon svg {
             width: 40px;
             height: 40px;
             color: white;
         }
 
+        .program-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .program-content {
+            padding: 2.5rem;
+        }
+
+        .program-description {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .program-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .program-features li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .program-features li::before {
+            content: '✓';
+            width: 20px;
+            height: 20px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
         /* News Section */
         .news-section {
-            padding: 6rem 0;
-            background: linear-gradient(to bottom, #ffffff, #f8fafc);
-            position: relative;
-        }
-
-        .news-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100px;
-            background: linear-gradient(to bottom, 
-                rgba(37, 99, 235, 0.05) 0%,
-                transparent 100%);
-            z-index: 1;
-        }
-
-        .news-card {
-            border-radius: 20px;
-            overflow: hidden;
+            padding: 8rem 0;
             background: white;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
-            transition: all 0.4s ease;
-            border: 1px solid rgba(37, 99, 235, 0.1);
         }
 
-        .news-card:hover {
+        .news-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 4rem;
+            margin-top: 4rem;
+        }
+
+        .featured-news {
+            position: relative;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .featured-news:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.1);
+            box-shadow: var(--shadow-xl);
         }
 
-        .news-image {
-            position: relative;
-            height: 250px;
-            overflow: hidden;
+        .featured-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
         }
 
-        .news-image::after {
-            content: '';
+        .featured-overlay {
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, 
-                transparent 0%,
-                rgba(37, 99, 235, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 3rem;
+            color: white;
         }
 
-        .news-card:hover .news-image::after {
-            opacity: 1;
-        }
-
-        .news-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .news-card:hover .news-image img {
-            transform: scale(1.1);
-        }
-
-        .news-content {
-            padding: 2rem;
-            background: white;
-        }
-
-        .news-date {
-            color: #2563EB;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .news-title {
-            font-size: 1.5rem;
+        .featured-title {
+            font-size: 2rem;
             font-weight: 700;
-            color: #1F2937;
             margin-bottom: 1rem;
             line-height: 1.3;
-            transition: color 0.3s ease;
         }
 
-        .news-card:hover .news-title {
-            color: #2563EB;
-        }
-
-        .news-excerpt {
-            color: #4B5563;
+        .featured-excerpt {
             margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .featured-date {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .news-item {
+            background: var(--light-color);
+            padding: 2rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .news-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .news-item-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .news-item-excerpt {
+            color: #6b7280;
+            margin-bottom: 1rem;
             line-height: 1.6;
         }
 
-        .read-more {
-            color: #2563EB;
+        .news-item-date {
+            font-size: 0.9rem;
+            color: var(--primary-color);
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .read-more:hover {
-            color: #3B82F6;
-        }
-
-        .read-more svg {
-            margin-left: 0.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .read-more:hover svg {
-            transform: translateX(5px);
         }
 
         /* CTA Section */
         .cta-section {
-            background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
-            padding: 6rem 0;
-            color: white;
+            padding: 8rem 0;
+            background: var(--gradient-1);
             position: relative;
             overflow: hidden;
         }
 
-        .cta-section::before {
-            content: '';
+        .cta-pattern {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 L60 0 L60 60 L0 60 Z' fill='none' stroke='%23ffffff' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E") repeat;
+            width: 100%;
+            height: 100%;
             opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0);
+            background-size: 40px 40px;
         }
 
-        .cta-content {
-            text-align: center;
-            max-width: 800px;
+        .cta-container {
+            max-width: 1000px;
             margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
             position: relative;
-            z-index: 1;
+            z-index: 10;
         }
 
         .cta-title {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 2rem;
             line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .cta-description {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .cta-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 2rem;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .cta-button {
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.2rem; }
+            .about-grid { grid-template-columns: 1fr; gap: 4rem; }
+            .news-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .section-title { font-size: 2.2rem; }
+            .cta-title { font-size: 2.5rem; }
+            .about-features { grid-template-columns: 1fr; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title { font-size: 2rem; }
+            .programs-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Utility Classes */
+        .btn {
             padding: 1rem 2rem;
             border-radius: 50px;
             font-weight: 600;
+            text-decoration: none;
             transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
         }
 
-        .cta-button-primary {
-            background: white;
-            color: #2563EB;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-
-        .cta-button-primary:hover {
-            background: #f8fafc;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
-
-        .cta-button-secondary {
-            background: rgba(255,255,255,0.1);
+        .btn-primary {
+            background: var(--gradient-1);
             color: white;
-            border: 2px solid white;
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
 
-        .cta-button-secondary:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 @endpush
@@ -600,386 +893,532 @@
 @section('content')
     <!-- Modal Banner Highlight -->
     @if($profilSekolah && $profilSekolah->banner_highlight)
-    <div id="bannerModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <img src="{{ asset('storage/' . $profilSekolah->banner_highlight) }}" alt="Banner Highlight" class="modal-image">
+    <div id="bannerModal" class="banner-modal">
+        <div class="banner-modal-content">
+            <button class="banner-modal-close" onclick="closeBannerModal()" aria-label="Tutup Modal">&times;</button>
+            <div id="bannerModalLoading" class="banner-modal-loading" style="display: none;">
+                Memuat gambar...
+            </div>
+            <img id="bannerModalImage" 
+                 src="{{ asset('storage/' . $profilSekolah->banner_highlight) }}" 
+                 alt="Banner Highlight - {{ $profilSekolah->nama_sekolah ?? 'Sekolah' }}" 
+                 class="banner-modal-image"
+                 onload="handleImageLoad()"
+                 onerror="handleImageError()">
         </div>
     </div>
     @endif
 
-    <!-- Hero Slider -->
-    <div class="hero-slider">
-        <div class="swiper mySwiper">
-            <div class="swiper-wrapper">
-                @forelse ($sliders as $slider)
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background">
+            <div class="hero-pattern"></div>
+            <div class="hero-blob"></div>
+            <div class="hero-blob"></div>
+            <div class="hero-blob"></div>
+        </div>
+
+        @if($sliders->count() > 0)
+        <!-- Hero Slider -->
+        <div class="hero-slider">
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper">
+                    @foreach ($sliders as $slider)
                     <div class="swiper-slide">
-                        <img src="{{ asset('storage/' . $slider->image) }}" alt="{{ $slider->judul ?? 'Slider Image' }}">
+                        <div class="slide-bg" style="background-image: url('{{ asset('storage/' . $slider->image) }}')"></div>
+                        <div class="slide-overlay"></div>
                         <div class="slide-content">
                             @if ($slider->judul)
-                                <h2>{{ $slider->judul }}</h2>
+                                <h1 class="hero-title">{{ $slider->judul }}</h1>
                             @endif
                             @if ($slider->deskripsi)
-                                <p>{{ $slider->deskripsi }}</p>
+                                <p class="hero-subtitle">{{ $slider->deskripsi }}</p>
                             @endif
                             @if ($slider->link)
-                                <a href="{{ $slider->link }}" class="cta-button">Lihat Detail</a>
+                                <div class="hero-buttons">
+                                    <a href="{{ $slider->link }}" class="btn-hero btn-hero-primary">
+                                        Pelajari Lebih Lanjut
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                        </svg>
+                                    </a>
+                                </div>
                             @endif
                         </div>
                     </div>
-                @empty
-                    <div class="swiper-slide">
-                        <img src="{{ asset('images/default-slider.jpg') }}" alt="Default Slider">
-                        <div class="slide-content">
-                            <h2>Selamat Datang</h2>
-                            <p>Tambahkan slider baru melalui dashboard admin.</p>
-                        </div>
-                    </div>
-                @endforelse
+                    @endforeach
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
-            <div class="swiper-pagination"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
         </div>
-        <div class="decorative-wave"></div>
-        <div class="decorative-dots"></div>
-        <div class="decorative-lines"></div>
-    </div>
+        @else
+        <!-- Static Hero Content -->
+        <div class="hero-content">
+            <h1 class="hero-title">Masa Depan Cerah<br>Dimulai dari Sini</h1>
+            <p class="hero-subtitle">Bergabunglah dengan SMK terdepan yang menghadirkan pendidikan berkualitas tinggi dengan teknologi modern dan pengajar berpengalaman</p>
+            <div class="hero-buttons">
+                <a href="{{ route('web.ppdb.index') }}" class="btn-hero btn-hero-primary">
+                    Daftar Sekarang
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+                <a href="{{ route('web.profil.index') }}" class="btn-hero btn-hero-secondary">
+                    Tentang Kami
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        @endif
+    </section>
 
-    <!-- Features Section -->
-    <section class="features-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <!-- Left Content -->
-                <div class="relative">
-                    <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-                    <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-                    <div class="relative z-10">
-                        <span class="text-blue-600 font-semibold text-lg mb-2 block">Keunggulan Kami</span>
-                        <h2 class="text-4xl font-bold text-gray-900 sm:text-5xl mb-6">Mengapa Memilih Kami?</h2>
-                        <p class="text-xl text-gray-600 mb-8">Kami menyediakan pendidikan berkualitas dengan fasilitas modern dan tenaga pengajar yang berpengalaman.</p>
-                        <div class="space-y-6">
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-semibold text-gray-900">Fasilitas Modern</h3>
-                                    <p class="text-gray-600 mt-1">Laboratorium dan peralatan modern untuk pembelajaran yang efektif.</p>
-                                </div>
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="section-header">
+                <h2 class="section-title">Prestasi yang Membanggakan</h2>
+                <p class="section-subtitle">Angka-angka yang menunjukkan komitmen kami dalam memberikan pendidikan terbaik</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <div class="stat-number" data-count="{{ $stats['alumni'] }}">0</div>
+                    <div class="stat-label">Alumni Sukses</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number" data-count="{{ $stats['guru'] }}">0</div>
+                    <div class="stat-label">Guru Profesional</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number" data-count="{{ $stats['jurusan'] }}">0</div>
+                    <div class="stat-label">Program Keahlian</div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-number" data-count="{{ $stats['kelulusan'] }}">0</div>
+                    <div class="stat-label">% Tingkat Kelulusan</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <div class="about-grid">
+                <div class="about-content fade-in">
+                    <h2>Membangun <span class="highlight">Generasi Unggul</span> untuk Masa Depan</h2>
+                    <p>Kami berkomitmen memberikan pendidikan vokasi terbaik yang menggabungkan teori dan praktik, mempersiapkan siswa dengan keterampilan yang dibutuhkan industri modern.</p>
+                    
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
                             </div>
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-semibold text-gray-900">Kurikulum Terkini</h3>
-                                    <p class="text-gray-600 mt-1">Kurikulum yang selalu diperbarui sesuai kebutuhan industri.</p>
-                                </div>
+                            <span class="feature-text">Pembelajaran Inovatif</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
                             </div>
-                            <div class="flex items-start space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-semibold text-gray-900">Guru Berpengalaman</h3>
-                                    <p class="text-gray-600 mt-1">Tenaga pengajar yang kompeten dan berpengalaman.</p>
-                                </div>
+                            <span class="feature-text">Laboratorium Modern</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
                             </div>
+                            <span class="feature-text">Guru Berpengalaman</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                </svg>
+                            </div>
+                            <span class="feature-text">Sertifikasi Industri</span>
                         </div>
                     </div>
                 </div>
-                <!-- Right Content - Image Grid -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-4">
-                        <div class="rounded-2xl overflow-hidden h-64">
-                            <img src="{{ asset('images/facility-1.jpg') }}" alt="Fasilitas" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <div class="rounded-2xl overflow-hidden h-48">
-                            <img src="{{ asset('images/facility-2.jpg') }}" alt="Fasilitas" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
-                        </div>
+                
+                <div class="about-image fade-in">
+                    @if($fasilitas->count() > 0)
+                        <img src="{{ asset('storage/' . $fasilitas[0]->image) }}" alt="{{ $fasilitas[0]->nama }}">
+                    @else
+                        <img src="{{ asset('images/default-facility.jpg') }}" alt="Fasilitas Sekolah">
+                    @endif
+                    
+                    <div class="image-card image-card-1">
+                        <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">15+</h4>
+                        <p style="margin: 0; opacity: 0.9;">Tahun Pengalaman</p>
                     </div>
-                    <div class="space-y-4 mt-8">
-                        <div class="rounded-2xl overflow-hidden h-48">
-                            <img src="{{ asset('images/facility-3.jpg') }}" alt="Fasilitas" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <div class="rounded-2xl overflow-hidden h-64">
-                            <img src="{{ asset('images/facility-4.jpg') }}" alt="Fasilitas" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
-                        </div>
+                    
+                    <div class="image-card image-card-2">
+                        <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">95%</h4>
+                        <p style="margin: 0; opacity: 0.9;">Lulusan Bekerja</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- News Section -->
-    <section class="news-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <span class="text-blue-600 font-semibold text-lg mb-2 block">Berita Terbaru</span>
-                <h2 class="text-4xl font-bold text-gray-900 sm:text-5xl mb-4">Informasi Terkini</h2>
-                <p class="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">Dapatkan informasi terbaru seputar kegiatan dan prestasi sekolah kami.</p>
+    <!-- Programs Section -->
+    <section class="programs-section">
+        <div class="programs-container">
+            <div class="section-header">
+                <h2 class="section-title">Program Keahlian Unggulan</h2>
+                <p class="section-subtitle">Pilih program keahlian yang sesuai dengan minat dan bakat Anda</p>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                @foreach($latestNews as $index => $news)
-                    @if($index === 0)
-                        <div class="lg:col-span-8">
-                            <article class="news-card-featured group">
-                                <div class="relative h-[500px] rounded-2xl overflow-hidden">
-                                    <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->judul }}" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                    <div class="absolute bottom-0 left-0 right-0 p-8">
-                                        <div class="text-white/80 mb-2 flex items-center">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                            </svg>
-                                            {{ $news->created_at->format('d M Y') }}
-                                        </div>
-                                        <h3 class="text-3xl font-bold text-white mb-4 group-hover:text-blue-300">{{ $news->judul }}</h3>
-                                        <p class="text-white/80 mb-6">{{ Str::limit(strip_tags($news->konten), 200) }}</p>
-                                        <a href="{{ route('web.berita.show', $news->slug) }}" class="inline-flex items-center text-white hover:text-blue-300">
-                                            Baca selengkapnya
-                                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
-                            </article>
+            
+            <div class="programs-grid">
+                @forelse($jurusans as $jurusan)
+                <div class="program-card fade-in">
+                    <div class="program-header">
+                        <div class="program-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                            </svg>
                         </div>
-                        <div class="lg:col-span-4 space-y-8">
-                    @else
-                        <article class="news-card-compact group">
-                            <div class="flex space-x-4">
-                                <div class="flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden">
-                                    <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->judul }}" class="w-full h-full object-cover">
-                                </div>
-                                <div class="flex-1">
-                                    <div class="text-blue-600 text-sm mb-2">{{ $news->created_at->format('d M Y') }}</div>
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600">{{ $news->judul }}</h3>
-                                    <p class="text-gray-600 text-sm mb-3">{{ Str::limit(strip_tags($news->konten), 80) }}</p>
-                                    <a href="{{ route('web.berita.show', $news->slug) }}" class="text-blue-600 text-sm font-medium hover:text-blue-700">
-                                        Baca selengkapnya
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
-                    @endif
-                @endforeach
+                        <h3 class="program-title">{{ $jurusan->nama_jurusan }}</h3>
+                    </div>
+                    <div class="program-content">
+                        <p class="program-description">{{ $jurusan->deskripsi ?: 'Program keahlian yang mempersiapkan siswa dengan kemampuan praktis dan teoritis sesuai dengan kebutuhan industri modern.' }}</p>
+                        <ul class="program-features">
+                            <li>Kurikulum Terbaru</li>
+                            <li>Praktik Industri</li>
+                            <li>Sertifikasi Profesi</li>
+                            <li>{{ $jurusan->kepalaJurusan ? 'Dipimpin ' . $jurusan->kepalaJurusan->nama : 'Tim Pengajar Berpengalaman' }}</li>
+                        </ul>
+                    </div>
+                </div>
+                @empty
+                <!-- Default programs jika belum ada data jurusan -->
+                <div class="program-card fade-in">
+                    <div class="program-header">
+                        <div class="program-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                            </svg>
+                        </div>
+                        <h3 class="program-title">Teknik Komputer & Jaringan</h3>
+                    </div>
+                    <div class="program-content">
+                        <p class="program-description">Program keahlian yang mempersiapkan siswa untuk menjadi teknisi komputer dan jaringan profesional dengan kemampuan instalasi, konfigurasi, dan maintenance sistem.</p>
+                        <ul class="program-features">
+                            <li>Hardware & Software</li>
+                            <li>Networking & Security</li>
+                            <li>Troubleshooting System</li>
+                            <li>Sertifikasi Internasional</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="program-card fade-in">
+                    <div class="program-header">
+                        <div class="program-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                            </svg>
+                        </div>
+                        <h3 class="program-title">Rekayasa Perangkat Lunak</h3>
+                    </div>
+                    <div class="program-content">
+                        <p class="program-description">Mempersiapkan siswa menjadi programmer dan software developer handal dengan kemampuan merancang, mengembangkan, dan memelihara aplikasi software.</p>
+                        <ul class="program-features">
+                            <li>Programming Languages</li>
+                            <li>Web & Mobile Development</li>
+                            <li>Database Management</li>
+                            <li>Project Management</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="program-card fade-in">
+                    <div class="program-header">
+                        <div class="program-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        <h3 class="program-title">Akuntansi & Keuangan</h3>
+                    </div>
+                    <div class="program-content">
+                        <p class="program-description">Program yang menghasilkan tenaga ahli di bidang akuntansi dan keuangan dengan kemampuan mengelola pembukuan dan laporan keuangan perusahaan.</p>
+                        <ul class="program-features">
+                            <li>Financial Accounting</li>
+                            <li>Computer Accounting</li>
+                            <li>Tax Management</li>
+                            <li>Business Analysis</li>
+                        </ul>
+                    </div>
+                </div>
+                @endforelse
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    @if($latestNews->count() > 0)
+    <section class="news-section">
+        <div class="news-container">
+            <div class="section-header">
+                <h2 class="section-title">Berita & Informasi Terkini</h2>
+                <p class="section-subtitle">Dapatkan update terbaru tentang kegiatan dan prestasi sekolah</p>
+            </div>
+            
+            <div class="news-grid">
+                <div class="featured-news fade-in" onclick="window.location.href='{{ route('web.berita.show', $latestNews[0]->slug) }}'">
+                    <img src="{{ asset('storage/' . $latestNews[0]->image) }}" alt="{{ $latestNews[0]->judul }}" class="featured-image">
+                    <div class="featured-overlay">
+                        <div class="featured-date">{{ $latestNews[0]->created_at->format('d M Y') }}</div>
+                        <h3 class="featured-title">{{ $latestNews[0]->judul }}</h3>
+                        <p class="featured-excerpt">{{ Str::limit(strip_tags($latestNews[0]->konten), 120) }}</p>
+                    </div>
+                </div>
+                
+                <div class="news-list">
+                    @foreach($latestNews->skip(1)->take(3) as $news)
+                    <div class="news-item fade-in" onclick="window.location.href='{{ route('web.berita.show', $news->slug) }}'">
+                        <h4 class="news-item-title">{{ $news->judul }}</h4>
+                        <p class="news-item-excerpt">{{ Str::limit(strip_tags($news->konten), 80) }}</p>
+                        <div class="news-item-date">{{ $news->created_at->format('d M Y') }}</div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
-
-            <div class="text-center mt-12">
-                <a href="{{ route('web.berita.index') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+            
+            <div style="text-align: center; margin-top: 4rem;">
+                <a href="{{ route('web.berita.index') }}" class="btn btn-primary">
                     Lihat Semua Berita
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </a>
             </div>
         </div>
     </section>
+    @endif
 
     <!-- CTA Section -->
     <section class="cta-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 to-blue-800">
-                <div class="absolute inset-0">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 mix-blend-multiply"></div>
-                    <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:60px_60px]"></div>
-                </div>
-                <div class="relative py-16 px-6 sm:py-24 sm:px-12 lg:px-16">
-                    <div class="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-                        <div>
-                            <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                                Siap untuk Memulai Perjalanan Belajarmu?
-                            </h2>
-                            <p class="mt-4 text-lg text-blue-100">
-                                Daftar sekarang untuk tahun ajaran baru dan wujudkan impianmu bersama kami dalam lingkungan belajar yang inspiratif.
-                            </p>
-                            <div class="mt-8 flex flex-col sm:flex-row gap-4">
-                                <a href="{{ route('web.ppdb.index') }}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-blue-600 bg-white hover:bg-blue-50 transition-colors">
-                                    Daftar PPDB
-                                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                    </svg>
-                                </a>
-                                <a href="{{ route('web.contact.index') }}" class="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors">
-                                    Hubungi Kami
-                                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="mt-12 lg:mt-0">
-                            <div class="relative">
-                                <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-blue-600 rounded-2xl blur opacity-25"></div>
-                                <div class="relative bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-                                    <div class="space-y-4">
-                                        <div class="flex items-center space-x-4">
-                                            <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 class="text-lg font-semibold text-white">Pendaftaran Dibuka</h3>
-                                                <p class="text-blue-100">Tahun Ajaran 2024/2025</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center space-x-4">
-                                            <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <h3 class="text-lg font-semibold text-white">Kuota Terbatas</h3>
-                                                <p class="text-blue-100">Segera daftarkan dirimu</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="cta-pattern"></div>
+        <div class="cta-container">
+            <h2 class="cta-title">Siap Memulai Perjalanan Menuju Sukses?</h2>
+            <p class="cta-description">Bergabunglah dengan ribuan alumni sukses yang telah memulai karir gemilang dari SMK kami. Masa depan cerah menanti Anda!</p>
+            <div class="cta-buttons">
+                <a href="{{ route('web.ppdb.index') }}" class="btn-hero btn-hero-primary">
+                    Daftar SPMB
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+                <a href="{{ route('web.contact.index') }}" class="btn-hero btn-hero-secondary">
+                    Hubungi Kami
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                </a>
             </div>
         </div>
     </section>
-
-    <style>
-        @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-    </style>
 @endsection
 
 @push('scripts')
-    <!-- Link Swiper's JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Banner Modal Handler
+    @if($profilSekolah && $profilSekolah->banner_highlight)
+    if (shouldShowModal()) {
+        // Tampilkan modal setelah 1 detik
+        setTimeout(function() {
+            showBannerModal();
+        }, 1000);
+        
+        // Simpan tanggal hari ini ke localStorage
+        const today = new Date().toDateString();
+        localStorage.setItem('bannerModalLastShown', today);
+    }
+    @endif
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Modal functionality
-            const modal = document.getElementById('bannerModal');
-            const closeBtn = document.querySelector('.close-modal');
+    // Initialize Swiper if sliders exist
+    @if ($sliders->count() > 0)
+    const swiper = new Swiper('.mySwiper', {
+        effect: 'fade',
+        speed: 1000,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        loop: true,
+    });
+    @endif
 
-            // Show modal when page loads
-            if (modal) {
-                setTimeout(() => {
-                    modal.style.display = 'block';
-                }, 1000);
+    // Scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
             }
-
-            // Close modal when clicking the close button
-            if (closeBtn) {
-                closeBtn.onclick = function() {
-                    modal.style.display = 'none';
-                }
-            }
-
-            // Close modal when clicking outside the modal content
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            }
-
-            // Initialize Swiper with enhanced effects
-            @if ($sliders->count() > 0)
-                var swiper = new Swiper(".mySwiper", {
-                    effect: "fade",
-                    speed: 1000,
-                    autoplay: {
-                        delay: 5000,
-                        disableOnInteraction: false,
-                    },
-                    pagination: {
-                        el: ".swiper-pagination",
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: ".swiper-button-next",
-                        prevEl: ".swiper-button-prev",
-                    },
-                    loop: true,
-                    on: {
-                        init: function() {
-                            this.slides.forEach((slide, index) => {
-                                const content = slide.querySelector('.slide-content');
-                                if (content) {
-                                    content.style.opacity = '0';
-                                    content.style.transform = 'translateY(-50%) translateX(-50px)';
-                                }
-                            });
-                        },
-                        slideChangeTransitionStart: function() {
-                            const activeSlide = this.slides[this.activeIndex];
-                            const content = activeSlide.querySelector('.slide-content');
-                            if (content) {
-                                content.style.opacity = '0';
-                                content.style.transform = 'translateY(-50%) translateX(-50px)';
-                            }
-                        },
-                        slideChangeTransitionEnd: function() {
-                            const activeSlide = this.slides[this.activeIndex];
-                            const content = activeSlide.querySelector('.slide-content');
-                            if (content) {
-                                content.style.opacity = '1';
-                                content.style.transform = 'translateY(-50%) translateX(0)';
-                            }
-                        }
-                    }
-                });
-            @endif
-
-            // Animate elements on scroll
-            const animateOnScroll = () => {
-                const elements = document.querySelectorAll('.feature-card, .news-card');
-                
-                elements.forEach(element => {
-                    const elementTop = element.getBoundingClientRect().top;
-                    const elementBottom = element.getBoundingClientRect().bottom;
-                    
-                    if (elementTop < window.innerHeight && elementBottom > 0) {
-                        element.style.opacity = '1';
-                        element.style.transform = 'translateY(0)';
-                    }
-                });
-            };
-
-            // Set initial state
-            document.querySelectorAll('.feature-card, .news-card').forEach(element => {
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(20px)';
-                element.style.transition = 'all 0.6s ease';
-            });
-
-            // Add scroll event listener
-            window.addEventListener('scroll', animateOnScroll);
-            // Initial check
-            animateOnScroll();
         });
-    </script>
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Counter animation
+    function animateCounter(element, target, duration = 2000) {
+        let start = 0;
+        const increment = target / (duration / 16);
+        
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+                element.textContent = target;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(start);
+            }
+        }, 16);
+    }
+
+    // Animate stats when visible
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target.querySelector('.stat-number');
+                const target = parseInt(counter.getAttribute('data-count'));
+                animateCounter(counter, target);
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-card').forEach(card => {
+        statsObserver.observe(card);
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+
+// Banner Modal Functions
+function showBannerModal() {
+    const modal = document.getElementById('bannerModal');
+    const image = document.getElementById('bannerModalImage');
+    const loading = document.getElementById('bannerModalLoading');
+    
+    if (modal && image) {
+        // Show loading
+        loading.style.display = 'block';
+        image.classList.add('loading');
+        
+        // Show modal
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+        
+        // Check if image is already loaded
+        if (image.complete && image.naturalHeight !== 0) {
+            handleImageLoad();
+        }
+    }
+}
+
+function closeBannerModal() {
+    const modal = document.getElementById('bannerModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+}
+
+function handleImageLoad() {
+    const image = document.getElementById('bannerModalImage');
+    const loading = document.getElementById('bannerModalLoading');
+    
+    if (image && loading) {
+        loading.style.display = 'none';
+        image.classList.remove('loading');
+    }
+}
+
+function handleImageError() {
+    const modal = document.getElementById('bannerModal');
+    const loading = document.getElementById('bannerModalLoading');
+    
+    if (loading) {
+        loading.innerHTML = 'Gagal memuat gambar';
+        setTimeout(() => {
+            closeBannerModal();
+        }, 2000);
+    }
+}
+
+// Close modal when clicking outside of it
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('bannerModal');
+    const modalContent = document.querySelector('.banner-modal-content');
+    
+    if (modal && event.target === modal && !modalContent?.contains(event.target)) {
+        closeBannerModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeBannerModal();
+    }
+});
+
+// Prevent modal from showing if user prefers reduced motion
+function shouldShowModal() {
+    @if($profilSekolah && $profilSekolah->banner_highlight)
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+        return false;
+    }
+    
+    const today = new Date().toDateString();
+    const lastShown = localStorage.getItem('bannerModalLastShown');
+    
+    return lastShown !== today;
+    @else
+    return false;
+    @endif
+}
+</script>
 @endpush 

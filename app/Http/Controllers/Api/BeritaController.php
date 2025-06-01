@@ -16,7 +16,8 @@ class BeritaController extends Controller
         try {
             Log::info('Mencoba mengambil data berita');
             $berita = Berita::with('kategori')
-                ->where('status', 'published')
+                ->where('is_published', true)
+                ->where('published_at', '<=', now())
                 ->orderBy('published_at', 'desc')
                 ->get();
             
@@ -37,7 +38,7 @@ class BeritaController extends Controller
                 'judul' => 'required|string|max:255',
                 'konten' => 'required|string',
                 'kategori_id' => 'required|exists:kategori,id',
-                'status' => 'required|in:draft,published',
+                'is_published' => 'required|boolean',
                 'published_at' => 'nullable|date',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
             ]);
@@ -57,8 +58,8 @@ class BeritaController extends Controller
                 'slug' => \Str::slug($request->judul),
                 'konten' => $request->konten,
                 'kategori_id' => $request->kategori_id,
-                'status' => $request->status,
-                'published_at' => $request->published_at,
+                'is_published' => $request->is_published,
+                'published_at' => $request->published_at ?? now(),
                 'image' => $imagePath ?? null
             ]);
             
@@ -98,7 +99,7 @@ class BeritaController extends Controller
                 'judul' => 'sometimes|required|string|max:255',
                 'konten' => 'sometimes|required|string',
                 'kategori_id' => 'sometimes|required|exists:kategori,id',
-                'status' => 'sometimes|required|in:draft,published',
+                'is_published' => 'sometimes|required|boolean',
                 'published_at' => 'nullable|date',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
             ]);

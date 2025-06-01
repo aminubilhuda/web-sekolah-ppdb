@@ -4,19 +4,15 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Cache;
 use App\Services\FileUploadService;
-use App\Models\ProfilSekolah;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\View;
+use App\Models\ProfilSekolah;
 use App\Models\Ppdb;
 use App\Models\Slider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    private static $profil = null;
-    private static $ppdbPendingCount = null;
-    private static $sliderInactiveCount = null;
-
     /**
      * Register any application services.
      */
@@ -24,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(FileUploadService::class, function ($app) {
             return new FileUploadService();
+        });
+
+        // Singleton untuk ProfilSekolah
+        $this->app->singleton('profil_sekolah', function ($app) {
+            return CacheService::getProfilSekolah();
         });
     }
 
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         // Model observers for cache clearing
+        \App\Models\ProfilSekolah::observe(\App\Observers\ProfilSekolahObserver::class);
         \App\Models\Ppdb::observe(\App\Observers\PpdbObserver::class);
         \App\Models\Jurusan::observe(\App\Observers\JurusanObserver::class);
         \App\Models\Guru::observe(\App\Observers\GuruObserver::class);
@@ -42,43 +44,29 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Berita::observe(\App\Observers\BeritaObserver::class);
         \App\Models\Slider::observe(\App\Observers\SliderObserver::class);
 
-        // Share data ke semua view dalam satu composer
-        View::composer('*', function ($view) {
-            // Cache profil sekolah
-            if (self::$profil === null) {
-                self::$profil = Cache::remember('profil_sekolah', 60 * 60, function () {
-                    return ProfilSekolah::first();
-                });
-            }
-
-            // Cache PPDB pending count
-            if (self::$ppdbPendingCount === null) {
-                self::$ppdbPendingCount = Cache::remember('ppdb_pending_count', 60, function () {
-                    return Ppdb::where('status', 'pending')->count();
-                });
-            }
-
-            // Cache slider inactive count
-            if (self::$sliderInactiveCount === null) {
-                self::$sliderInactiveCount = Cache::remember('slider_inactive_count', 60, function () {
-                    return Slider::where('is_active', false)->count();
-                });
-            }
-
-            // Share semua data ke view
+        // Hanya share ke view web, bukan admin
+        View::composer(['web.*', 'layouts.app'], function ($view) {
+            $profil = app('profil_sekolah');
+            
             $view->with([
-                'profil' => self::$profil,
-                'nama_sekolah' => self::$profil ? self::$profil->nama_sekolah : config('app.name'),
-                'ppdbPendingCount' => self::$ppdbPendingCount,
-                'sliderInactiveCount' => self::$sliderInactiveCount
+                'profil' => $profil,
+                'profilSekolah' => $profil, // Alias untuk konsistensi
+                'nama_sekolah' => $profil ? $profil->nama_sekolah : config('app.name'),
+            ]);
+        });
+
+        // Share data admin hanya ke view admin dengan caching yang efisien
+        View::composer(['filament.*', 'admin.*'], function ($view) {
+            $view->with([
+                'ppdbPendingCount' => CacheService::getPpdbPendingCount(),
+                'sliderInactiveCount' => CacheService::getSliderInactiveCount()
             ]);
         });
     }
 
-    public static function clearCounts()
+    public static function clearProfilCache()
     {
-        self::$profil = null;
-        self::$ppdbPendingCount = null;
-        self::$sliderInactiveCount = null;
+        CacheService::clearProfilCache();
+        app()->forgetInstance('profil_sekolah');
     }
 }

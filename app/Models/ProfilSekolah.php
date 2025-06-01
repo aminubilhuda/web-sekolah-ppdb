@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use App\Providers\AppServiceProvider;
 
 class ProfilSekolah extends Model
 {
@@ -59,21 +60,11 @@ class ProfilSekolah extends Model
                 $profil->slug = Str::slug($profil->nama_sekolah);
             }
         });
-
-        static::saved(function ($profil) {
-            Cache::forget('profil_sekolah');
-        });
-
-        static::deleted(function ($profil) {
-            Cache::forget('profil_sekolah');
-        });
     }
 
     public static function getCached()
     {
-        return Cache::remember('profil_sekolah', 3600, function () {
-            return static::first();
-        });
+        return app('profil_sekolah');
     }
 
     public function getLogoUrlAttribute()
