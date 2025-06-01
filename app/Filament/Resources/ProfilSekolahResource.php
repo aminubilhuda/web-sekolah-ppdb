@@ -15,6 +15,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
+use App\Services\GeminiAIService;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Str;
 
 class ProfilSekolahResource extends Resource
 {
@@ -139,10 +142,94 @@ class ProfilSekolahResource extends Resource
                             ->label('Kepala Sekolah')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\Textarea::make('sambutan_kepala')
+                    ])->columns(2),
+
+                Forms\Components\Section::make('🤖 AI Writer - Sambutan Kepala Sekolah')
+                    ->schema([
+                        Forms\Components\Grid::make(4)
+                            ->schema([
+                                Forms\Components\TextInput::make('ai_acara')
+                                    ->label('Acara/Konteks')
+                                    ->placeholder('Contoh: Tahun Ajaran Baru 2024/2025')
+                                    ->helperText('Masukkan acara atau konteks sambutan')
+                                    ->columnSpan(2),
+                                Forms\Components\TextInput::make('ai_pesan_utama')
+                                    ->label('Pesan Utama')
+                                    ->placeholder('Contoh: Semangat belajar dan meraih prestasi')
+                                    ->helperText('Pesan yang ingin disampaikan')
+                                    ->columnSpan(1),
+                                Forms\Components\Actions::make([
+                                    Forms\Components\Actions\Action::make('generate_ai_sambutan')
+                                        ->label('✨ Generate AI')
+                                        ->color('warning')
+                                        ->icon('heroicon-o-sparkles')
+                                        ->requiresConfirmation()
+                                        ->modalHeading('Generate Sambutan Kepala Sekolah dengan AI')
+                                        ->modalDescription('AI akan membantu menulis sambutan kepala sekolah yang inspiratif.')
+                                        ->action(function (array $data, Forms\Set $set, Forms\Get $get) {
+                                            if (empty($data['ai_acara'])) {
+                                                Notification::make()
+                                                    ->title('Acara/Konteks diperlukan')
+                                                    ->body('Silakan masukkan acara atau konteks sambutan terlebih dahulu')
+                                                    ->warning()
+                                                    ->send();
+                                                return;
+                                            }
+
+                                            try {
+                                                $aiService = new GeminiAIService();
+                                                
+                                                // Generate sambutan kepala sekolah
+                                                $aiParams = [
+                                                    'acara' => $data['ai_acara'],
+                                                    'tema' => $data['ai_acara'],
+                                                    'audiens' => 'siswa, guru, dan orang tua',
+                                                    'pesan_utama' => $data['ai_pesan_utama'] ?? 'motivasi dan semangat belajar'
+                                                ];
+
+                                                $generatedContent = $aiService->generateSambutanKepsek($aiParams);
+                                                
+                                                if ($generatedContent) {
+                                                    $set('sambutan_kepala', $generatedContent);
+                                                    
+                                                    Notification::make()
+                                                        ->title('Berhasil Generate Sambutan!')
+                                                        ->body('Sambutan kepala sekolah telah dibuat oleh AI. Silakan review dan edit sesuai kebutuhan.')
+                                                        ->success()
+                                                        ->send();
+                                                } else {
+                                                    throw new \Exception('Gagal generate sambutan');
+                                                }
+
+                                            } catch (\Exception $e) {
+                                                Notification::make()
+                                                    ->title('Error Generate AI')
+                                                    ->body('Terjadi kesalahan: ' . $e->getMessage())
+                                                    ->danger()
+                                                    ->send();
+                                            }
+                                        })
+                                ])
+                                    ->columnSpan(1),
+                            ])
+                    ])
+                    ->collapsible()
+                    ->collapsed()
+                    ->description('Gunakan AI untuk membantu menulis sambutan kepala sekolah yang inspiratif'),
+
+                Forms\Components\Section::make('Sambutan & Profil Sekolah')
+                    ->schema([
+                        Forms\Components\RichEditor::make('sambutan_kepala')
                             ->label('Sambutan Kepala Sekolah')
                             ->required()
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'underline',
+                                'bulletList',
+                                'orderedList',
+                            ]),
                         Forms\Components\RichEditor::make('sejarah')
                             ->label('Sejarah')
                             ->required()

@@ -14,6 +14,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use App\Services\GeminiAIService;
+use Filament\Notifications\Notification;
 
 class PengumumanResource extends Resource
 {
@@ -38,6 +40,96 @@ class PengumumanResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('🤖 AI Writer')
+                    ->schema([
+                        Forms\Components\Grid::make(4)
+                            ->schema([
+                                Forms\Components\TextInput::make('ai_topik')
+                                    ->label('Topik Pengumuman')
+                                    ->placeholder('Contoh: Libur semester dan jadwal ujian')
+                                    ->helperText('Masukkan topik pengumuman')
+                                    ->columnSpan(2),
+                                Forms\Components\Select::make('ai_target')
+                                    ->label('Target Audiens')
+                                    ->options([
+                                        'seluruh siswa' => 'Seluruh Siswa',
+                                        'siswa kelas 10' => 'Siswa Kelas 10',
+                                        'siswa kelas 11' => 'Siswa Kelas 11', 
+                                        'siswa kelas 12' => 'Siswa Kelas 12',
+                                        'guru dan staff' => 'Guru dan Staff',
+                                        'orang tua' => 'Orang Tua',
+                                        'masyarakat umum' => 'Masyarakat Umum',
+                                    ])
+                                    ->default('seluruh siswa')
+                                    ->columnSpan(1),
+                                Forms\Components\Actions::make([
+                                    Forms\Components\Actions\Action::make('generate_ai_pengumuman')
+                                        ->label('✨ Generate AI')
+                                        ->color('warning')
+                                        ->icon('heroicon-o-sparkles')
+                                        ->requiresConfirmation()
+                                        ->modalHeading('Generate Pengumuman dengan AI')
+                                        ->modalDescription('AI akan membantu menulis pengumuman berdasarkan topik dan target audiens.')
+                                        ->action(function (array $data, Forms\Set $set, Forms\Get $get) {
+                                            if (empty($data['ai_topik'])) {
+                                                Notification::make()
+                                                    ->title('Topik diperlukan')
+                                                    ->body('Silakan masukkan topik pengumuman terlebih dahulu')
+                                                    ->warning()
+                                                    ->send();
+                                                return;
+                                            }
+
+                                            try {
+                                                $aiService = new GeminiAIService();
+                                                
+                                                // Generate judul jika belum ada
+                                                if (empty($get('judul'))) {
+                                                    $judulPrompt = "Buatkan judul pengumuman resmi untuk topik: {$data['ai_topik']}. Hanya berikan judulnya saja, maksimal 8 kata, formal.";
+                                                    $generatedJudul = $aiService->generateContent($judulPrompt);
+                                                    if ($generatedJudul) {
+                                                        $set('judul', trim($generatedJudul));
+                                                    }
+                                                }
+
+                                                // Generate konten pengumuman
+                                                $aiParams = [
+                                                    'judul' => $get('judul') ?: $data['ai_topik'],
+                                                    'topik' => $data['ai_topik'],
+                                                    'target' => $data['ai_target'] ?? 'seluruh siswa',
+                                                    'tanggal' => now()->format('d F Y')
+                                                ];
+
+                                                $generatedContent = $aiService->generatePengumuman($aiParams);
+                                                
+                                                if ($generatedContent) {
+                                                    $set('konten', $generatedContent);
+                                                    
+                                                    Notification::make()
+                                                        ->title('Berhasil Generate Pengumuman!')
+                                                        ->body('Konten pengumuman telah dibuat oleh AI. Silakan review dan edit sesuai kebutuhan.')
+                                                        ->success()
+                                                        ->send();
+                                                } else {
+                                                    throw new \Exception('Gagal generate konten');
+                                                }
+
+                                            } catch (\Exception $e) {
+                                                Notification::make()
+                                                    ->title('Error Generate AI')
+                                                    ->body('Terjadi kesalahan: ' . $e->getMessage())
+                                                    ->danger()
+                                                    ->send();
+                                            }
+                                        })
+                                ])
+                                    ->columnSpan(1),
+                            ])
+                    ])
+                    ->collapsible()
+                    ->collapsed()
+                    ->description('Gunakan AI untuk membantu menulis pengumuman secara otomatis'),
+
                 Forms\Components\Section::make('Data Pengumuman')
                     ->schema([
                         Forms\Components\TextInput::make('judul')

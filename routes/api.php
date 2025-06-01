@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\DownloadController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\Lk3Controller;
+use App\Http\Controllers\Api\GeminiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +87,14 @@ Route::middleware('api')->group(function () {
     
     // LK3 CRUD
     Route::apiResource('lk3', Lk3Controller::class);
+
+    // Gemini AI Routes - Inspired by techsolutionstuff.com tutorial
+    Route::prefix('gemini')->group(function () {
+        Route::get('/test', [GeminiController::class, 'test']);
+        Route::get('/models', [GeminiController::class, 'models']);
+        Route::post('/generate', [GeminiController::class, 'generate']);
+        Route::post('/generate-advanced', [GeminiController::class, 'generateAdvanced']);
+    });
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
