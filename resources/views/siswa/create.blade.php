@@ -226,11 +226,11 @@
 
                                 <div class="form-group">
                                     <label for="status">Status</label>
-                                    <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
-                                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Aktif</option>
-                                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Tidak Aktif</option>
+                                    <select class="form-control @error('is_active') is-invalid @enderror" id="is_active" name="is_active">
+                                        <option value="1" {{ old('is_active') == '1' ? 'selected' : '' }}>Aktif</option>
+                                        <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Tidak Aktif</option>
                                     </select>
-                                    @error('status')
+                                    @error('is_active')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

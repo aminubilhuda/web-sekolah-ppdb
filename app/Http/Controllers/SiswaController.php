@@ -17,7 +17,7 @@ class SiswaController extends Controller
 
     public function create()
     {
-        $jurusans = Jurusan::where('status', true)->get();
+        $jurusans = Jurusan::all();
         return view('siswa.create', compact('jurusans'));
     }
 
@@ -74,7 +74,7 @@ class SiswaController extends Controller
 
     public function edit(Siswa $siswa)
     {
-        $jurusans = Jurusan::where('status', true)->get();
+        $jurusans = Jurusan::all();
         return view('siswa.edit', compact('siswa', 'jurusans'));
     }
 

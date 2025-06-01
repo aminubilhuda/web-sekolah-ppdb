@@ -16,6 +16,12 @@ return new class extends Migration
             $table->string('pembina')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('nama_ekstrakurikuler');
+            $table->index('pembina');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 

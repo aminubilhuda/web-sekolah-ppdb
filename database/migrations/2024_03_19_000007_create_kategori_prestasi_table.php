@@ -14,6 +14,10 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('deskripsi')->nullable();
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('nama');
+            $table->index('created_at');
         });
     }
 

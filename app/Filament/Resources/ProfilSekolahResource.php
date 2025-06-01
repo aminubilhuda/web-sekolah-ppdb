@@ -4,6 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProfilSekolahResource\Pages;
 use App\Models\ProfilSekolah;
+use App\Services\FileUploadService;
+use App\Traits\HasOptimizedResource;
+use App\Traits\HasOptimizedFileUpload;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,6 +18,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfilSekolahResource extends Resource
 {
+    use HasOptimizedResource;
+    use HasOptimizedFileUpload;
+
     protected static ?string $model = ProfilSekolah::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
@@ -180,43 +186,43 @@ class ProfilSekolahResource extends Resource
                     ->schema([
                         Forms\Components\FileUpload::make('logo')
                             ->label('Logo')
-                            ->image()
                             ->required()
-                            ->directory('profil/logo')
-                            ->imagePreviewHeight('50')
-                            ->panelLayout('simple')
-                            ->columnSpanFull(),
+                            ->image()
+                            ->directory('profil')
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->imageResizeTargetWidth('200')
+                            ->imageResizeTargetHeight('200'),
                         Forms\Components\FileUpload::make('favicon')
                             ->label('Favicon')
-                            ->image()
                             ->required()
+                            ->image()
                             ->directory('profil/favicon')
-                            ->imagePreviewHeight('50')
-                            ->panelLayout('simple')
-                            ->columnSpanFull(),
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->imageResizeTargetWidth('32')
+                            ->imageResizeTargetHeight('32'),
                         Forms\Components\FileUpload::make('banner_highlight')
                             ->label('Banner Highlight')
+                            ->required()
                             ->image()
-                            ->nullable()
                             ->directory('profil/banner')
-                            ->imagePreviewHeight('50')
-                            ->panelLayout('simple')
-                            ->downloadable()
-                            ->openable()
-                            ->columnSpanFull(),
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('16:9')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('600'),
                         Forms\Components\FileUpload::make('gedung_image')
-                            ->label('Gambar Gedung Sekolah')
+                            ->label('Gedung Image')
+                            ->required()
                             ->image()
-                            ->nullable()
                             ->directory('profil/gedung')
-                            ->imagePreviewHeight('50')
-                            ->panelLayout('simple')
-                            ->downloadable()
-                            ->openable()
-                            ->columnSpanFull(),
-                    ]),
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('4:3')
+                            ->imageResizeTargetWidth('800')
+                            ->imageResizeTargetHeight('600'),
+                    ])->columns(2),
 
-                Forms\Components\Section::make('Media Sosial')
+                Forms\Components\Section::make('Social Media')
                     ->schema([
                         Forms\Components\TextInput::make('website')
                             ->label('Website')
@@ -256,48 +262,39 @@ class ProfilSekolahResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table
+        return parent::table($table)
             ->columns([
                 Tables\Columns\TextColumn::make('nama_sekolah')
                     ->label('Nama Sekolah')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('npsn')
                     ->label('NPSN')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'negeri' => 'success',
-                        'swasta' => 'warning',
-                    }),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('jenis')
                     ->label('Jenis')
-                    ->badge(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status_akreditasi')
                     ->label('Status Akreditasi')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'a' => 'success',
-                        'b' => 'warning',
-                        'c' => 'danger',
-                    }),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('kepala_sekolah')
                     ->label('Kepala Sekolah')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->label('Email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('no_hp')
-                    ->label('No HP')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Tanggal Dibuat')
+                    ->label('Dibuat')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Terakhir Diperbarui')
+                    ->label('Diperbarui')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -307,7 +304,6 @@ class ProfilSekolahResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -318,9 +314,7 @@ class ProfilSekolahResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

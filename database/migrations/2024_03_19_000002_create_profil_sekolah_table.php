@@ -45,6 +45,14 @@ return new class extends Migration
             $table->string('banner_highlight')->nullable(); //muncul popup/modal saat halaman web dibuka
             $table->string('gedung_image')->nullable(); //gambar gedung sekolah untuk halaman profil
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('nama_sekolah');
+            $table->index('npsn');
+            $table->index('status');
+            $table->index('jenis');
+            $table->index('status_akreditasi');
+            $table->index('created_at');
         });
     }
 

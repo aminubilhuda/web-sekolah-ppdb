@@ -10,13 +10,16 @@ class GuruController extends Controller
 {
     public function index()
     {
-        $gurus = Guru::with('jurusan')->paginate(12);
+        $gurus = Guru::where('is_active', true)
+            ->orderBy('nama')
+            ->paginate(12);
+            
         return view('web.guru.index', compact('gurus'));
     }
 
     public function show(Guru $guru)
     {
-        $guru->load('jurusan', 'ekstrakurikuler');
+        // Hanya load guru tanpa relasi yang tidak ada
         return view('web.guru.show', compact('guru'));
     }
 } 

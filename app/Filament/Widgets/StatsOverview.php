@@ -24,11 +24,11 @@ class StatsOverview extends BaseWidget
         $semesterIni = Carbon::now()->startOfMonth()->subMonths(6);
         
         return [
-            Stat::make('Total Guru', Guru::where('status', 'aktif')->count())
+            Stat::make('Total Guru', Guru::where('is_active', true)->count())
                 ->description('Jumlah guru aktif')
                 ->descriptionIcon('heroicon-m-academic-cap')
                 ->color('success'),
-            Stat::make('Total Siswa', Siswa::where('status', 'aktif')->count())
+            Stat::make('Total Siswa', Siswa::where('is_active', true)->count())
                 ->description('Jumlah siswa aktif')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),

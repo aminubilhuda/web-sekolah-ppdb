@@ -9,6 +9,8 @@ class Slider extends Model
 {
     use HasFactory;
 
+    protected $table = 'sliders';
+
     protected $fillable = [
         'judul',
         'deskripsi',
@@ -16,9 +18,11 @@ class Slider extends Model
         'link',
         'is_published',
         'order',
+        'is_active'
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
+        'is_active' => 'boolean'
     ];
 }

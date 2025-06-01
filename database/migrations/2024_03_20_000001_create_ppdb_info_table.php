@@ -13,12 +13,18 @@ return new class extends Migration
             $table->string('judul');
             $table->string('subtitle');
             $table->string('gambar_background');
-            $table->json('persyaratan');
-            $table->json('jadwal');
-            $table->string('telepon');
-            $table->string('whatsapp');
-            $table->string('email');
+            $table->json('persyaratan')->nullable();
+            $table->json('jadwal')->nullable();
+            $table->text('panduan_pendaftaran')->nullable();
+            $table->json('langkah_pendaftaran')->nullable();
+            $table->string('telepon')->nullable();
+            $table->string('whatsapp')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('judul');
+            $table->index('created_at');
         });
     }
 

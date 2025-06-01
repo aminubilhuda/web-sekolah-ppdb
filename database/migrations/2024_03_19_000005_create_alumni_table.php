@@ -10,19 +10,19 @@ return new class extends Migration
     {
         Schema::create('alumni', function (Blueprint $table) {
             $table->id();
-            $table->string('nis')->nullable();
-            $table->string('nisn')->nullable();
+            $table->string('nis')->unique();
+            $table->string('nisn')->unique();
             $table->string('nama');
-            $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
-            $table->string('tempat_lahir')->nullable();
-            $table->date('tanggal_lahir')->nullable();
-            $table->string('agama')->nullable();
-            $table->text('alamat')->nullable();
-            $table->string('no_hp')->nullable();
-            $table->string('email')->nullable();
+            $table->enum('jenis_kelamin', ['L', 'P']);
+            $table->string('tempat_lahir');
+            $table->date('tanggal_lahir');
+            $table->string('agama');
+            $table->text('alamat');
+            $table->string('no_hp');
+            $table->string('email');
             $table->string('foto')->nullable();
             $table->foreignId('jurusan_id')->constrained('jurusan')->onDelete('cascade');
-            $table->integer('tahun_lulus');
+            $table->year('tahun_lulus');
             $table->boolean('status_bekerja')->default(false);
             $table->string('nama_perusahaan')->nullable();
             $table->string('jabatan')->nullable();
@@ -30,10 +30,18 @@ return new class extends Migration
             $table->boolean('status_kuliah')->default(false);
             $table->string('nama_kampus')->nullable();
             $table->string('jurusan_kuliah')->nullable();
-            $table->integer('tahun_masuk')->nullable();
+            $table->year('tahun_masuk')->nullable();
             $table->text('testimoni')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('nama');
+            $table->index('nis');
+            $table->index('tahun_lulus');
+            $table->index('jurusan_id');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 

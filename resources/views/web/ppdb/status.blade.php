@@ -36,14 +36,14 @@
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-semibold text-gray-900">Status Pendaftaran</h2>
                     <span class="px-3 py-1 rounded-full text-sm font-medium
-                        @if($ppdb->status == 'pending')
+                        @if($ppdb->status == 'Menunggu')
                             bg-yellow-100 text-yellow-800
-                        @elseif($ppdb->status == 'approved')
+                        @elseif($ppdb->status == 'Diterima')
                             bg-green-100 text-green-800
-                        @elseif($ppdb->status == 'rejected')
+                        @elseif($ppdb->status == 'Ditolak')
                             bg-red-100 text-red-800
                         @endif">
-                        {{ ucfirst($ppdb->status) }}
+                        {{ $ppdb->status }}
                     </span>
                 </div>
 
@@ -73,7 +73,7 @@
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Jurusan Pilihan</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->jurusan->nama_jurusan }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $ppdb->jurusan->nama_jurusan ?? 'Tidak ditemukan' }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Tanggal Daftar</dt>
@@ -116,7 +116,7 @@
                         </dl>
                     </div>
 
-                    @if($ppdb->status == 'approved')
+                    @if($ppdb->status == 'Diterima')
                     <div class="bg-green-50 border border-green-200 rounded-md p-4">
                         <h3 class="text-lg font-medium text-green-800 mb-2">Selamat! Anda Diterima</h3>
                         <p class="text-green-700 mb-4">Silakan lakukan daftar ulang dengan membawa dokumen asli ke sekolah pada tanggal yang telah ditentukan.</p>
@@ -126,15 +126,10 @@
                             <p class="text-sm text-green-600"><strong>Tempat:</strong> Ruang PPDB SMK Negeri 1 Jakarta</p>
                         </div>
                     </div>
-                    @elseif($ppdb->status == 'rejected')
+                    @elseif($ppdb->status == 'Ditolak')
                     <div class="bg-red-50 border border-red-200 rounded-md p-4">
                         <h3 class="text-lg font-medium text-red-800 mb-2">Mohon Maaf</h3>
-                        <p class="text-red-700">Pendaftaran Anda tidak dapat diproses karena beberapa alasan:</p>
-                        <ul class="mt-2 list-disc list-inside text-sm text-red-600">
-                            @foreach($ppdb->keterangan as $ket)
-                            <li>{{ $ket }}</li>
-                            @endforeach
-                        </ul>
+                        <p class="text-red-700">Pendaftaran Anda tidak dapat diproses. Silakan hubungi panitia PPDB untuk informasi lebih lanjut atau mencoba mendaftar kembali pada gelombang berikutnya.</p>
                     </div>
                     @else
                     <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">

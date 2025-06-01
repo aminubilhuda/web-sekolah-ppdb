@@ -17,6 +17,7 @@ class SliderSeeder extends Seeder
                 'link' => '/profil',
                 'is_published' => true,
                 'order' => 1,
+                'is_active' => true
             ],
             [
                 'judul' => 'Penerimaan Peserta Didik Baru 2024',
@@ -25,6 +26,7 @@ class SliderSeeder extends Seeder
                 'link' => '/ppdb',
                 'is_published' => true,
                 'order' => 2,
+                'is_active' => true
             ],
             [
                 'judul' => 'Fasilitas Modern',
@@ -33,6 +35,7 @@ class SliderSeeder extends Seeder
                 'link' => '/profil/fasilitas',
                 'is_published' => true,
                 'order' => 3,
+                'is_active' => true
             ],
         ];
 

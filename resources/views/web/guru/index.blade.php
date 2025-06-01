@@ -10,7 +10,15 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @forelse($gurus as $item)
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <img src="{{ asset($item->foto) }}" alt="{{ $item->nama }}" class="w-full h-48 object-cover">
+            @if($item->foto)
+                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->nama }}" class="w-full h-48 object-cover">
+            @else
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+            @endif
             <div class="p-6">
                 <h2 class="text-xl font-semibold mb-2">
                     <a href="{{ route('web.guru.show', $item->id) }}" class="text-gray-900 hover:text-primary-600">
@@ -18,10 +26,15 @@
                     </a>
                 </h2>
                 <div class="text-sm text-gray-500 mb-4">
-                    <p>NIP: {{ $item->nip }}</p>
-                    <p>Bidang: {{ $item->bidang }}</p>
-                    <p>Pendidikan: {{ $item->pendidikan }}</p>
+                    @if($item->nip)
+                        <p>NIP: {{ $item->nip }}</p>
+                    @endif
+                    <p>Jabatan: {{ $item->jabatan }}</p>
+                    <p>Bidang Studi: {{ $item->bidang_studi }}</p>
                 </div>
+                @if($item->deskripsi)
+                    <p class="text-gray-600 text-sm mb-4">{{ Str::limit($item->deskripsi, 100) }}</p>
+                @endif
                 <a href="{{ route('web.guru.show', $item->id) }}" class="text-primary-600 hover:text-primary-700 font-medium">
                     Lihat profil →
                 </a>

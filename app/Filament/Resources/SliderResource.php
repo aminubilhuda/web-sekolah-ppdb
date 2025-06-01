@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Filament\Resources\SliderResource\RelationManagers;
 use App\Models\Slider;
+use App\Services\FileUploadService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +14,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
+use App\Traits\HasOptimizedResource;
+use App\Traits\HasOptimizedFileUpload;
 
 class SliderResource extends Resource
 {
+    use HasOptimizedResource;
+    use HasOptimizedFileUpload;
+
     protected static ?string $model = Slider::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
@@ -23,6 +30,11 @@ class SliderResource extends Resource
     protected static ?string $modelLabel = 'Slider';
     protected static ?string $pluralModelLabel = 'Sliders';
     protected static ?string $navigationGroup = 'Konten Website';
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery(); // Tanpa relasi user
+    }
 
     public static function form(Form $form): Form
     {
@@ -37,9 +49,17 @@ class SliderResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    ->disk('public')
-                    ->directory('sliders'),
+                    ->directory('slider')
+                    ->preserveFilenames()
+                    ->imageResizeMode('cover')
+                    ->imageCropAspectRatio('16:9')
+                    ->imageResizeTargetWidth('1920')
+                    ->imageResizeTargetHeight('1080')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
+                    ->maxSize(5120)
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('link')
+                    ->url()
                     ->maxLength(255),
                 Forms\Components\Toggle::make('is_published')
                     ->label('Dipublikasikan')
@@ -54,7 +74,8 @@ class SliderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\ImageColumn::make('image')
+                    ->square(),
                 Tables\Columns\TextColumn::make('judul')
                     ->searchable()
                     ->sortable(),
@@ -77,11 +98,21 @@ class SliderResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Slider $record) {
+                        $fileUploadService = app(FileUploadService::class);
+                        $fileUploadService->deleteWithSizes($record->image);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function ($records) {
+                            $fileUploadService = app(FileUploadService::class);
+                            foreach ($records as $record) {
+                                $fileUploadService->deleteWithSizes($record->image);
+                            }
+                        }),
                 ]),
             ]);
     }
@@ -100,5 +131,9 @@ class SliderResource extends Resource
             'create' => Pages\CreateSlider::route('/create'),
             'edit' => Pages\EditSlider::route('/{record}/edit'),
         ];
+    }
+     public static function getNavigationBadge(): ?string
+    {
+        return view()->shared('sliderInactiveCount');
     }
 }

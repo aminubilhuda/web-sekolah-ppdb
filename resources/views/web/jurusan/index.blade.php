@@ -3,7 +3,7 @@
 @section('title', 'Jurusan')
 @section('meta_description', 'Informasi tentang jurusan-jurusan yang tersedia di sekolah kami')
 
-@push('styles')
+{{-- @push('styles')
 <style>
     .modal {
         display: none;
@@ -56,10 +56,10 @@
         border-radius: 0.5rem 0.5rem 0 0;
     }
 </style>
-@endpush
+@endpush --}}
 
 @section('content')
-<!-- Modal Banner Highlight -->
+{{-- <!-- Modal Banner Highlight -->
 @if($profilSekolah && $profilSekolah->banner_highlight)
 <div id="bannerModal" class="modal">
     <div class="modal-content">
@@ -67,7 +67,7 @@
         <img src="{{ asset('storage/' . $profilSekolah->banner_highlight) }}" alt="Banner Highlight" class="modal-image">
     </div>
 </div>
-@endif
+@endif --}}
 
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Jurusan</h1>
@@ -94,7 +94,7 @@
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm {{ $item->status ? 'text-green-600' : 'text-red-600' }}">
-                        {{ $item->status ? 'Aktif' : 'Tidak Aktif' }}
+                        {{ $item->is_active ? 'Aktif' : 'Tidak Aktif' }}
                     </span>
                     <a href="{{ route('web.jurusan.show', $item->id) }}" class="text-primary-600 hover:text-primary-700 font-medium">
                         Pelajari lebih lanjut →

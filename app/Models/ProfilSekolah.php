@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class ProfilSekolah extends Model
 {
+    use HasFactory;
+
     protected $table = 'profil_sekolah';
     
     protected $fillable = [
@@ -16,6 +20,13 @@ class ProfilSekolah extends Model
         'status',
         'jenis',
         'status_akreditasi',
+        'email',
+        'no_hp',
+        'alamat',
+        'provinsi',
+        'kabupaten',
+        'kecamatan',
+        'kode_pos',
         'lokasi_maps',
         'sk_pendirian',
         'sk_izin_operasional',
@@ -27,13 +38,8 @@ class ProfilSekolah extends Model
         'misi',
         'logo',
         'favicon',
-        'email',
-        'no_hp',
-        'alamat',
-        'provinsi',
-        'kabupaten',
-        'kecamatan',
-        'kode_pos',
+        'banner_highlight',
+        'gedung_image',
         'website',
         'facebook',
         'instagram',
@@ -42,8 +48,6 @@ class ProfilSekolah extends Model
         'tiktok',
         'whatsapp',
         'telegram',
-        'banner_highlight',
-        'gedung_image'
     ];
 
     protected static function boot()
@@ -55,5 +59,40 @@ class ProfilSekolah extends Model
                 $profil->slug = Str::slug($profil->nama_sekolah);
             }
         });
+
+        static::saved(function ($profil) {
+            Cache::forget('profil_sekolah');
+        });
+
+        static::deleted(function ($profil) {
+            Cache::forget('profil_sekolah');
+        });
+    }
+
+    public static function getCached()
+    {
+        return Cache::remember('profil_sekolah', 3600, function () {
+            return static::first();
+        });
+    }
+
+    public function getLogoUrlAttribute()
+    {
+        return $this->logo ? asset('storage/' . $this->logo) : null;
+    }
+
+    public function getFaviconUrlAttribute()
+    {
+        return $this->favicon ? asset('storage/' . $this->favicon) : null;
+    }
+
+    public function getBannerHighlightUrlAttribute()
+    {
+        return $this->banner_highlight ? asset('storage/' . $this->banner_highlight) : null;
+    }
+
+    public function getGedungImageUrlAttribute()
+    {
+        return $this->gedung_image ? asset('storage/' . $this->gedung_image) : null;
     }
 } 

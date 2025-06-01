@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\PPDB;
+use App\Models\Ppdb;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,7 +11,7 @@ class PpdbExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return PPDB::all();
+        return Ppdb::with('jurusan')->get();
     }
 
     public function headings(): array

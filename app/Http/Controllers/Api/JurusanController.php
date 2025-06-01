@@ -16,7 +16,7 @@ class JurusanController extends Controller
         try {
             Log::info('Mencoba mengambil data jurusan');
             $jurusan = Jurusan::with('kepalaJurusan')
-                ->where('status', true)
+                ->where('is_active', true)
                 ->orderBy('nama_jurusan', 'asc')
                 ->get();
             
@@ -39,7 +39,7 @@ class JurusanController extends Controller
                 'deskripsi' => 'required|string',
                 'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'kepala_jurusan_id' => 'nullable|exists:guru,id',
-                'status' => 'required|boolean'
+                'is_active' => 'required|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -58,7 +58,7 @@ class JurusanController extends Controller
                 'deskripsi' => $request->deskripsi,
                 'gambar' => $gambarPath ?? null,
                 'kepala_jurusan_id' => $request->kepala_jurusan_id,
-                'status' => $request->status
+                'is_active' => $request->is_active
             ]);
             
             Log::info('Jurusan berhasil disimpan', ['data' => $jurusan]);
@@ -99,7 +99,7 @@ class JurusanController extends Controller
                 'deskripsi' => 'sometimes|required|string',
                 'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'kepala_jurusan_id' => 'nullable|exists:guru,id',
-                'status' => 'sometimes|required|boolean'
+                'is_active' => 'sometimes|required|boolean'
             ]);
 
             if ($validator->fails()) {

@@ -4,21 +4,41 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SiswaResource\Pages;
 use App\Models\Siswa;
+use App\Services\FileUploadService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use App\Traits\HasOptimizedResource;
+use App\Traits\HasOptimizedFileUpload;
 
 class SiswaResource extends Resource
 {
+    use HasOptimizedResource;
+    use HasOptimizedFileUpload;
+
     protected static ?string $model = Siswa::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
-
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?string $navigationLabel = 'Siswa';
-
+    protected static ?string $modelLabel = 'Siswa';
     protected static ?string $pluralModelLabel = 'Siswa';
+    protected static ?int $navigationSort = 6;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['jurusan', 'kelas']); // Eager loading
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
 
     public static function form(Form $form): Form
     {
@@ -30,25 +50,26 @@ class SiswaResource extends Resource
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('nis')
+                            ->required()
                             ->maxLength(255)
-                            ->nullable(),
+                            ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('nisn')
+                            ->required()
                             ->maxLength(255)
-                            ->nullable(),
+                            ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('nik')
-                            ->maxLength(16)
-                            ->nullable(),
+                            ->maxLength(16),
                         Forms\Components\TextInput::make('tempat_lahir')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->required()
+                            ->maxLength(255),
                         Forms\Components\DatePicker::make('tanggal_lahir')
-                            ->nullable(),
+                            ->required(),
                         Forms\Components\Select::make('jenis_kelamin')
                             ->options([
-                                'L' => 'Laki-laki',
-                                'P' => 'Perempuan'
+                                'Laki-laki' => 'Laki-laki',
+                                'Perempuan' => 'Perempuan'
                             ])
-                            ->nullable(),
+                            ->required(),
                         Forms\Components\Select::make('agama')
                             ->options([
                                 'Islam' => 'Islam',
@@ -58,78 +79,92 @@ class SiswaResource extends Resource
                                 'Buddha' => 'Buddha',
                                 'Konghucu' => 'Konghucu'
                             ])
-                            ->nullable(),
-                        Forms\Components\Textarea::make('alamat')
-                            ->nullable()
-                            ->columnSpanFull(),
-                        Forms\Components\TextInput::make('kelas')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Select::make('jurusan_id')
-                            ->label('Jurusan')
-                            ->relationship('jurusan', 'nama_jurusan')
                             ->required(),
+                        Forms\Components\Textarea::make('alamat')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('no_hp')
+                            ->tel()
+                            ->maxLength(20),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->maxLength(255),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Data Ayah')
+                Forms\Components\Section::make('Data Akademik')
+                    ->schema([
+                        Forms\Components\Select::make('jurusan_id')
+                            ->relationship('jurusan', 'nama_jurusan')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Select::make('kelas_id')
+                            ->relationship('kelas', 'nama_kelas')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\TextInput::make('tahun_masuk')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1900)
+                            ->maxValue(date('Y')),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Data Orang Tua')
                     ->schema([
                         Forms\Components\TextInput::make('nama_ayah')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('nik_ayah')
-                            ->maxLength(16)
-                            ->nullable(),
+                            ->maxLength(16),
                         Forms\Components\TextInput::make('pekerjaan_ayah')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('no_hp_ayah')
-                            ->maxLength(255)
-                            ->nullable(),
-                    ])->columns(2),
-
-                Forms\Components\Section::make('Data Ibu')
-                    ->schema([
+                            ->tel()
+                            ->maxLength(20),
                         Forms\Components\TextInput::make('nama_ibu')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('nik_ibu')
-                            ->maxLength(16)
-                            ->nullable(),
+                            ->maxLength(16),
                         Forms\Components\TextInput::make('pekerjaan_ibu')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('no_hp_ibu')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->tel()
+                            ->maxLength(20),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Data Wali')
                     ->schema([
                         Forms\Components\TextInput::make('nama_wali')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('nik_wali')
-                            ->maxLength(16)
-                            ->nullable(),
+                            ->maxLength(16),
                         Forms\Components\TextInput::make('pekerjaan_wali')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('no_hp_wali')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->tel()
+                            ->maxLength(20),
                         Forms\Components\TextInput::make('hubungan_wali')
-                            ->maxLength(255)
-                            ->nullable(),
+                            ->maxLength(255),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Data Tambahan')
+                Forms\Components\Section::make('Foto & Status')
                     ->schema([
                         Forms\Components\FileUpload::make('foto')
                             ->image()
                             ->directory('siswa')
-                            ->nullable(),
-                        Forms\Components\Toggle::make('status')
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->imageResizeTargetWidth('500')
+                            ->imageResizeTargetHeight('500')
+                            ->label('Foto')
                             ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('deskripsi')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Status Aktif')
+                            ->helperText('Aktifkan siswa ini?')
                             ->default(true),
                     ])->columns(2),
             ]);
@@ -139,38 +174,83 @@ class SiswaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nama'),
-                Tables\Columns\TextColumn::make('nis'),
-                Tables\Columns\TextColumn::make('kelas'),
-                Tables\Columns\TextColumn::make('jurusan.nama_jurusan')->label('Jurusan'),
-                Tables\Columns\ImageColumn::make('foto'),
-                Tables\Columns\BooleanColumn::make('status'),
+                Tables\Columns\ImageColumn::make('foto')
+                    ->square(),
+                Tables\Columns\TextColumn::make('nama')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('nis')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('nisn')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('jurusan.nama_jurusan')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('kelas.nama_kelas')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Status Aktif')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('jenis_kelamin')
+                    ->options([
+                        'Laki-laki' => 'Laki-laki',
+                        'Perempuan' => 'Perempuan'
+                    ]),
+                Tables\Filters\SelectFilter::make('agama')
+                    ->options([
+                        'Islam' => 'Islam',
+                        'Kristen' => 'Kristen',
+                        'Katolik' => 'Katolik',
+                        'Hindu' => 'Hindu',
+                        'Buddha' => 'Buddha',
+                        'Konghucu' => 'Konghucu'
+                    ]),
+                Tables\Filters\SelectFilter::make('jurusan')
+                    ->relationship('jurusan', 'nama_jurusan'),
+                Tables\Filters\SelectFilter::make('kelas')
+                    ->relationship('kelas', 'nama_kelas'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Status Aktif'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Siswa $record) {
+                        $fileUploadService = app(FileUploadService::class);
+                        $fileUploadService->deleteWithSizes($record->foto);
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function ($records) {
+                            $fileUploadService = app(FileUploadService::class);
+                            foreach ($records as $record) {
+                                $fileUploadService->deleteWithSizes($record->foto);
+                            }
+                        }),
+                ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSiswa::route('/'),
+            'index' => Pages\ListSiswas::route('/'),
             'create' => Pages\CreateSiswa::route('/create'),
             'edit' => Pages\EditSiswa::route('/{record}/edit'),
         ];

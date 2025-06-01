@@ -15,6 +15,7 @@ class BeritaSeeder extends Seeder
                 'judul' => 'Pembukaan PPDB Tahun Ajaran 2024/2025',
                 'konten' => 'Pendaftaran Peserta Didik Baru (PPDB) tahun ajaran 2024/2025 akan dibuka pada tanggal 1 Juni 2024. Pendaftaran dilakukan secara online melalui website sekolah.',
                 'kategori_id' => 4,
+                'image' => 'berita1.jpg',
                 'status' => 'published',
                 'published_at' => now()
             ],
@@ -22,6 +23,7 @@ class BeritaSeeder extends Seeder
                 'judul' => 'Siswa SMK Juara Lomba Coding Nasional',
                 'konten' => 'Tim coding SMK berhasil meraih juara 1 dalam Lomba Coding Nasional yang diselenggarakan di Jakarta. Prestasi ini membuktikan kualitas pendidikan di bidang teknologi informasi.',
                 'kategori_id' => 2,
+                'image' => 'berita2.jpg',
                 'status' => 'published',
                 'published_at' => now()
             ],
@@ -29,6 +31,7 @@ class BeritaSeeder extends Seeder
                 'judul' => 'Kunjungan Industri ke PT. XYZ',
                 'konten' => 'Siswa kelas XI melakukan kunjungan industri ke PT. XYZ untuk mempelajari proses produksi dan manajemen perusahaan. Kunjungan ini merupakan bagian dari program pembelajaran di luar kelas.',
                 'kategori_id' => 3,
+                'image' => 'berita3.jpg',
                 'status' => 'published',
                 'published_at' => now()
             ]
@@ -40,6 +43,7 @@ class BeritaSeeder extends Seeder
                 'slug' => Str::slug($berita['judul']),
                 'konten' => $berita['konten'],
                 'kategori_id' => $berita['kategori_id'],
+                'image' => $berita['image'],
                 'status' => $berita['status'],
                 'published_at' => $berita['published_at']
             ]);

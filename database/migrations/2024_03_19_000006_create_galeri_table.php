@@ -17,6 +17,12 @@ return new class extends Migration
             $table->string('url_video')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('judul');
+            $table->index('jenis');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 

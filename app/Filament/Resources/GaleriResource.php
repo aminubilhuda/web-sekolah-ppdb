@@ -4,102 +4,75 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\GaleriResource\Pages;
 use App\Models\Galeri;
+use App\Traits\HasOptimizedResource;
+use App\Traits\HasOptimizedFileUpload;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class GaleriResource extends Resource
 {
+    use HasOptimizedResource;
+    use HasOptimizedFileUpload;
+
     protected static ?string $model = Galeri::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
+    protected static ?string $navigationLabel = 'Galeri';
+    protected static ?string $modelLabel = 'Galeri';
+    protected static ?string $pluralModelLabel = 'Galeri';
+    protected static ?int $navigationSort = 14;
 
-    protected static ?string $navigationGroup = 'Konten';
-
-    protected static ?int $navigationSort = 4;
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery(); // Tanpa relasi kategori
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Informasi Galeri')
+                Forms\Components\Section::make('Data Galeri')
                     ->schema([
                         Forms\Components\TextInput::make('judul')
                             ->required()
-                            ->maxLength(255)
-                            ->placeholder('Masukkan judul galeri'),
-                        Forms\Components\Textarea::make('deskripsi')
-                            ->maxLength(65535)
-                            ->placeholder('Masukkan deskripsi galeri')
-                            ->columnSpanFull(),
-                    ])->columns(1),
-
-                Forms\Components\Section::make('Media')
-                    ->schema([
+                            ->maxLength(255),
                         Forms\Components\Select::make('jenis')
                             ->required()
                             ->options([
                                 'foto' => 'Foto',
-                                'video' => 'Video'
+                                'video' => 'Video',
                             ])
                             ->default('foto')
-                            ->live()
-                            ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                if ($state === 'foto') {
-                                    $set('url_video', null);
-                                } else {
-                                    $set('gambar', null);
-                                }
-                            }),
+                            ->live(),
+                        Forms\Components\Textarea::make('deskripsi')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
                         Forms\Components\FileUpload::make('gambar')
                             ->image()
                             ->directory('galeri')
-                            ->visible(fn (Forms\Get $get) => $get('jenis') === 'foto')
+                            ->preserveFilenames()
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('16:9')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('1080')
                             ->columnSpanFull()
-                            ->helperText('Format: JPG, JPEG, PNG. Maksimal 2MB'),
+                            ->visible(fn (Forms\Get $get): bool => $get('jenis') === 'foto'),
                         Forms\Components\TextInput::make('url_video')
+                            ->label('URL Video')
                             ->url()
-                            ->placeholder('Masukkan URL video (YouTube/Vimeo)')
-                            ->visible(fn (Forms\Get $get) => $get('jenis') === 'video')
                             ->columnSpanFull()
-                            ->helperText('Masukkan URL video dari YouTube atau Vimeo'),
-                    ])->columns(1),
-
-                Forms\Components\Section::make('Multiple Foto')
-                    ->schema([
-                        Forms\Components\Repeater::make('foto')
-                            ->relationship()
-                            ->schema([
-                                Forms\Components\FileUpload::make('gambar')
-                                    ->required()
-                                    ->image()
-                                    ->directory('galeri/foto')
-                                    ->columnSpanFull()
-                                    ->helperText('Format: JPG, JPEG, PNG. Maksimal 2MB'),
-                                Forms\Components\TextInput::make('urutan')
-                                    ->numeric()
-                                    ->default(0)
-                                    ->helperText('Urutan tampilan foto (0 = pertama)'),
-                            ])
-                            ->columns(1)
-                            ->defaultItems(0)
-                            ->reorderable()
-                            ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => isset($state['gambar']) ? 'Foto ' . ($state['urutan'] ?? 0) : null)
-                            ->visible(fn (Forms\Get $get) => $get('jenis') === 'foto')
-                    ])->columns(1),
-
-                Forms\Components\Section::make('Pengaturan')
-                    ->schema([
+                            ->visible(fn (Forms\Get $get): bool => $get('jenis') === 'video'),
                         Forms\Components\Toggle::make('status')
-                            ->required()
-                            ->default(true)
                             ->label('Status Aktif')
-                            ->helperText('Aktifkan untuk menampilkan galeri di website'),
-                    ])->columns(1),
+                            ->helperText('Aktifkan galeri ini?')
+                            ->default(true),
+                    ])->columns(2),
             ]);
     }
 
@@ -107,31 +80,31 @@ class GaleriResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('gambar')
+                    ->square(),
                 Tables\Columns\TextColumn::make('judul')
                     ->searchable()
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('gambar')
-                    ->square()
-                    ->visible(fn ($record) => $record && $record->jenis === 'foto'),
+                    ->sortable()
+                    ->limit(50),
                 Tables\Columns\TextColumn::make('jenis')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'foto' => 'success',
-                        'video' => 'danger',
+                        'video' => 'info',
                     }),
-                Tables\Columns\TextColumn::make('foto_count')
-                    ->label('Jumlah Foto')
-                    ->counts('foto')
-                    ->visible(fn ($record) => $record && $record->jenis === 'foto'),
+                Tables\Columns\TextColumn::make('url_video')
+                    ->label('URL Video')
+                    ->limit(50)
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('status')
-                    ->boolean()
-                    ->label('Status'),
+                    ->label('Status Aktif')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime('d M Y H:i')
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime('d M Y H:i')
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -139,16 +112,13 @@ class GaleriResource extends Resource
                 Tables\Filters\SelectFilter::make('jenis')
                     ->options([
                         'foto' => 'Foto',
-                        'video' => 'Video'
+                        'video' => 'Video',
                     ]),
                 Tables\Filters\TernaryFilter::make('status')
-                    ->label('Status')
-                    ->boolean()
-                    ->trueLabel('Aktif')
-                    ->falseLabel('Tidak Aktif')
-                    ->placeholder('Semua'),
+                    ->label('Status Aktif'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -156,7 +126,8 @@ class GaleriResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

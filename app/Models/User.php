@@ -8,10 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -48,5 +50,61 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function pengumuman()
+    {
+        return $this->hasMany(Pengumuman::class, 'user_id');
+    }
+
+    public static function getCached()
+    {
+        return Cache::remember('users_all', 3600, function () {
+            return self::with(['roles'])
+                ->withCount(['pengumuman'])
+                ->get();
+        });
+    }
+
+    public static function getCachedActive()
+    {
+        return Cache::remember('users_active', 3600, function () {
+            return self::where('status', 'active')
+                ->with(['roles'])
+                ->withCount(['pengumuman'])
+                ->get();
+        });
+    }
+
+    public static function getCachedByRole($roleName)
+    {
+        return Cache::remember("users_role_{$roleName}", 3600, function () use ($roleName) {
+            return self::role($roleName)
+                ->where('status', 'active')
+                ->with(['roles'])
+                ->withCount(['pengumuman'])
+                ->get();
+        });
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($user) {
+            Cache::forget('users_all');
+            Cache::forget('users_active');
+            foreach ($user->roles as $role) {
+                Cache::forget("users_role_{$role->name}");
+            }
+        });
+
+        static::deleted(function ($user) {
+            Cache::forget('users_all');
+            Cache::forget('users_active');
+            foreach ($user->roles as $role) {
+                Cache::forget("users_role_{$role->name}");
+            }
+        });
     }
 }

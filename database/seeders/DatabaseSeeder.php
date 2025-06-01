@@ -2,10 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,34 +11,47 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'abdira@gmail.com',
-            'email_verified_at' => now(),
-            'username' => 'abdira',
-            'role' => 'admin',
-            'status' => 'active'
-        ]);
-
         $this->call([
-            JurusanSeeder::class,
-            AgendaSeeder::class,
-            AlumniSeeder::class,
+            // User dan Role
+            UserSeeder::class,
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            
+            // Data Master
             KategoriSeeder::class,
-            BeritaSeeder::class,
-            EkstrakurikulerSeeder::class,
-            FasilitasSeeder::class,
+            KategoriPrestasiSeeder::class,
+            
+            // Data Pengguna
             GuruSeeder::class,
             JurusanSeeder::class,
-            KategoriPrestasiSeeder::class,
-            Lk3Seeder::class,
-            PpdbSeeder::class,
-            PrestasiSeeder::class,
-            ProfilSekolahSeeder::class,
+            KelasSeeder::class,
+            MapelSeeder::class,
             SiswaSeeder::class,
+            
+            // Data Akademik
+            NilaiSeeder::class,
+            
+            // Data Sekolah
+            ProfilSekolahSeeder::class,
+            FasilitasSeeder::class,
+            EkstrakurikulerSeeder::class,
+            MitraIndustriSeeder::class,
+            
+            // Data Konten
+            BeritaSeeder::class,
+            PengumumanSeeder::class,
+            AgendaSeeder::class,
+            GaleriSeeder::class,
             SliderSeeder::class,
+            
+            // Data PPDB
+            PpdbInfoSeeder::class,
+            PpdbSeeder::class,
+            
+            // Data Prestasi
+            PrestasiSeeder::class,
+            AlumniSeeder::class,
+            Lk3Seeder::class,
         ]);
     }
 }

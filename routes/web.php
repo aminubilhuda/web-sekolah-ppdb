@@ -19,6 +19,7 @@ use App\Http\Controllers\Web\DownloadController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Web\MitraIndustriController;
+use App\Http\Controllers\FasilitasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +40,7 @@ Route::prefix('profil')->name('web.profil.')->group(function () {
     Route::get('/visi-misi', [ProfilController::class, 'visiMisi'])->name('visi-misi');
     Route::get('/akreditasi', [ProfilController::class, 'akreditasi'])->name('akreditasi');
     Route::get('/hubungan-industri', [ProfilController::class, 'hubunganIndustri'])->name('hubungan-industri');
-    Route::get('/fasilitas', [ProfilController::class, 'fasilitas'])->name('fasilitas');
+    Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas');
 });
 
 // Berita
@@ -82,6 +83,7 @@ Route::prefix('ppdb')->name('web.ppdb.')->group(function () {
     Route::post('/store', [PPDBController::class, 'store'])->name('store');
     Route::get('/success', [PPDBController::class, 'success'])->name('success');
     Route::get('/status', [PPDBController::class, 'status'])->name('status');
+    Route::get('/check', [PPDBController::class, 'check'])->name('check');
     Route::get('/panduan', [PPDBController::class, 'panduan'])->name('panduan');
 });
 
@@ -158,3 +160,9 @@ Route::get('/storage/{path}', function ($path) {
 })->where('path', '.*');
 
 Route::get('/galeri', [App\Http\Controllers\Web\GaleriController::class, 'index'])->name('web.galeri.index');
+
+// Fasilitas Routes
+Route::prefix('fasilitas')->name('fasilitas.')->group(function () {
+    Route::get('/', [FasilitasController::class, 'index'])->name('index');
+    Route::get('/{slug}', [FasilitasController::class, 'show'])->name('show');
+});

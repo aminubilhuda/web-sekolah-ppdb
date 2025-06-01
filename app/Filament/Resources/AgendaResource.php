@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class AgendaResource extends Resource
 {
@@ -20,6 +21,11 @@ class AgendaResource extends Resource
     protected static ?string $navigationLabel = 'Agenda';
 
     protected static ?string $pluralModelLabel = 'Agenda';
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery();
+    }
 
     public static function form(Form $form): Form
     {

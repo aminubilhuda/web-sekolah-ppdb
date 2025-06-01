@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\PPDB;
+use App\Models\Ppdb;
 use App\Models\Jurusan;
 use App\Models\PPDBInfo;
 use Illuminate\Http\Request;
@@ -20,7 +20,7 @@ class PPDBController extends Controller
 
     public function form()
     {
-        $jurusans = Jurusan::where('status', true)->get();
+        $jurusans = Jurusan::all();
         return view('web.ppdb.form', compact('jurusans'));
     }
 
@@ -73,9 +73,9 @@ class PPDBController extends Controller
         }
 
         // Generate nomor pendaftaran
-        $validated['nomor_pendaftaran'] = 'PPDB-' . date('Y') . '-' . str_pad(PPDB::count() + 1, 4, '0', STR_PAD_LEFT);
+        $validated['nomor_pendaftaran'] = 'PPDB-' . date('Y') . '-' . str_pad(Ppdb::count() + 1, 4, '0', STR_PAD_LEFT);
 
-        PPDB::create($validated);
+        Ppdb::create($validated);
 
         return redirect()->route('web.ppdb.success')->with('success', 'Pendaftaran berhasil! Silahkan cek email Anda untuk informasi selanjutnya.');
     }
@@ -85,18 +85,31 @@ class PPDBController extends Controller
         return view('web.ppdb.success');
     }
 
+    public function status()
+    {
+        return view('web.ppdb.status');
+    }
+
     public function check(Request $request)
     {
         $request->validate([
             'nomor_pendaftaran' => 'required|string'
         ]);
 
-        $ppdb = PPDB::where('nomor_pendaftaran', $request->nomor_pendaftaran)->first();
+        $ppdb = Ppdb::with('jurusan')
+            ->where('nomor_pendaftaran', $request->nomor_pendaftaran)
+            ->first();
 
         if (!$ppdb) {
-            return back()->with('error', 'Nomor pendaftaran tidak ditemukan.');
+            return redirect()->route('web.ppdb.status')
+                ->with('error', 'Nomor pendaftaran tidak ditemukan.');
         }
 
-        return view('web.ppdb.check', compact('ppdb'));
+        return view('web.ppdb.status', compact('ppdb'));
+    }
+
+    public function panduan()
+    {
+        return view('web.ppdb.panduan');
     }
 } 

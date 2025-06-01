@@ -17,6 +17,13 @@ return new class extends Migration
             $table->foreignId('kategori_id')->constrained('kategori_prestasi')->onDelete('cascade');
             $table->boolean('status')->default(true);
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('judul');
+            $table->index('kategori_id');
+            $table->index('tanggal');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 

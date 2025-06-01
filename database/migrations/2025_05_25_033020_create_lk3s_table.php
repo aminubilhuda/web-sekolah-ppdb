@@ -20,6 +20,12 @@ return new class extends Migration
             $table->string('tahun');
             $table->enum('status', ['draft', 'published'])->default('draft');
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('judul');
+            $table->index('tahun');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 

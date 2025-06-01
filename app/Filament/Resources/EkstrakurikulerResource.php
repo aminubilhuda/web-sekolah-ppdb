@@ -26,6 +26,12 @@ class EkstrakurikulerResource extends Resource
 
     protected static ?int $navigationSort = 5;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['guru']); // Eager loading untuk relasi guru
+    }
+
     public static function form(Form $form): Form
     {
         return $form

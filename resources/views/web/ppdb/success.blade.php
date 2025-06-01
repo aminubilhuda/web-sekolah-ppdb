@@ -1,4 +1,4 @@
-@extends('web.layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Pendaftaran Berhasil - PPDB')
 

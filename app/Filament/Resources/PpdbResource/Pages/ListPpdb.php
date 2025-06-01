@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PpdbResource\Pages;
 
 use App\Filament\Resources\PpdbResource;
+use App\Filament\Widgets\PpdbStatsWidget;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\Exports\PpdbExport;
@@ -16,7 +17,8 @@ class ListPpdb extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Buat PPDB'),
+                ->label('Tambah Pendaftar')
+                ->icon('heroicon-o-plus'),
             Actions\Action::make('export')
                 ->label('Export Excel')
                 ->icon('heroicon-o-arrow-down-tray')
@@ -24,6 +26,13 @@ class ListPpdb extends ListRecords
                 ->action(function () {
                     return Excel::download(new PpdbExport, 'data-ppdb-' . date('Y-m-d') . '.xlsx');
                 })
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PpdbStatsWidget::class,
         ];
     }
 } 

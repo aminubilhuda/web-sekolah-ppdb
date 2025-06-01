@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('ppdb', function (Blueprint $table) {
             $table->id();
+            $table->string('nomor_pendaftaran')->unique()->nullable();
             $table->string('nama_lengkap');
             $table->string('nisn');
             $table->string('nik');

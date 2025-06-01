@@ -23,6 +23,12 @@ class AlumniResource extends Resource
     protected static ?string $pluralModelLabel = 'Alumni';
     protected static ?int $navigationSort = 5;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['jurusan']); // Eager loading untuk relasi jurusan
+    }
+
     public static function form(Form $form): Form
     {
         return $form

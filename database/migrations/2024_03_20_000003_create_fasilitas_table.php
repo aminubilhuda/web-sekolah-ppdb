@@ -16,6 +16,11 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
+
+            // Menambahkan indeks
+            $table->index('nama');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 
