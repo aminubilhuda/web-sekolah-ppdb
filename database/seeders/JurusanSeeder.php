@@ -24,28 +24,6 @@ class JurusanSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'nama_jurusan' => 'Multimedia',
-                'singkatan' => 'MM',
-                'deskripsi' => 'Jurusan yang mempelajari tentang desain grafis, animasi, video editing, dan konten digital.',
-                'gambar' => 'jurusan/multimedia.jpg',
-                'kuota' => 100,
-                'kepala_jurusan_id' => 2,
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_jurusan' => 'Teknik Komputer dan Jaringan',
-                'singkatan' => 'TKJ',
-                'deskripsi' => 'Jurusan yang mempelajari tentang jaringan komputer, sistem operasi, dan administrasi sistem.',
-                'gambar' => 'jurusan/tkj.jpg',
-                'kuota' => 100,
-                'kepala_jurusan_id' => 3,
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
         ];
 
         DB::table('jurusan')->insert($jurusan);
