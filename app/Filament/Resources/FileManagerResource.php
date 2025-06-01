@@ -115,81 +115,123 @@ class FileManagerResource extends Resource
                     ]),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('delete_files')
-                    ->label('Hapus Terpilih')
+                Tables\Actions\BulkAction::make('delete_selected_files')
+                    ->label('Hapus File Terpilih')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Hapus File Terpilih?')
+                    ->modalHeading('Hapus File yang Dipilih?')
                     ->modalDescription('File yang dipilih akan dihapus permanen')
-                    ->action(function ($records) {
-                        \Log::info('Bulk delete started', [
-                            'records_count' => count($records),
-                            'records' => $records->toArray()
-                        ]);
+                    ->action(function ($records, $livewire) {
+                        \Log::info('=== CHECKBOX BULK DELETE START ===');
                         
-                        $deleted = 0;
-                        $errors = [];
+                        // Get selected keys from livewire component
+                        $selectedKeys = $livewire->selectedTableRecords ?? [];
+                        \Log::info('Selected keys from livewire', ['keys' => $selectedKeys]);
                         
-                        foreach ($records as $record) {
-                            try {
-                                $filePath = $record->email ?? null; // Use email field as path
-                                $fileName = $record->name ?? 'unknown';
+                        if (empty($selectedKeys)) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Info')
+                                ->body('Tidak ada file yang dipilih. Silakan centang checkbox file yang ingin dihapus.')
+                                ->info()
+                                ->send();
+                            return;
+                        }
+                        
+                        // Get all files from storage to match with selected IDs
+                        $storageFiles = collect();
+                        $publicPath = storage_path('app/public');
+                        
+                        if (\Illuminate\Support\Facades\File::exists($publicPath)) {
+                            $files = \Illuminate\Support\Facades\File::allFiles($publicPath);
+                            
+                            foreach ($files as $file) {
+                                $relativePath = str_replace($publicPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+                                $relativePath = str_replace('\\', '/', $relativePath);
                                 
-                                \Log::info('Processing file for delete', [
-                                    'file_name' => $fileName,
-                                    'file_path' => $filePath,
-                                    'record_email' => $record->email,
-                                    'record_name' => $record->name
-                                ]);
-                                
-                                if ($filePath && Storage::disk('public')->exists($filePath)) {
-                                    $result = Storage::disk('public')->delete($filePath);
-                                    if ($result) {
-                                        $deleted++;
-                                        \Log::info('File deleted successfully', ['file' => $fileName]);
-                                    } else {
-                                        $errors[] = "Gagal hapus: $fileName";
-                                        \Log::warning('Delete operation failed', ['file' => $fileName]);
-                                    }
-                                } else {
-                                    $errors[] = "File tidak ditemukan: $fileName";
-                                    \Log::warning('File not found', [
-                                        'file_path' => $filePath,
-                                        'exists' => Storage::disk('public')->exists($filePath ?? ''),
-                                        'public_path' => storage_path('app/public/' . $filePath)
-                                    ]);
+                                if (basename($relativePath) === '.gitignore') {
+                                    continue;
                                 }
-                            } catch (\Exception $e) {
-                                $errors[] = "Error: {$e->getMessage()}";
-                                \Log::error('Error deleting file', [
-                                    'error' => $e->getMessage(),
-                                    'file' => $record->name ?? 'unknown'
+                                
+                                $fileId = abs(crc32($relativePath));
+                                $storageFiles->put($fileId, [
+                                    'id' => $fileId,
+                                    'name' => $file->getFilename(),
+                                    'path' => $relativePath,
                                 ]);
                             }
                         }
                         
-                        // Show detailed notification
+                        \Log::info('Storage files loaded', ['count' => $storageFiles->count()]);
+                        
+                        $deleted = 0;
+                        $errors = [];
+                        
+                        foreach ($selectedKeys as $selectedId) {
+                            try {
+                                $fileData = $storageFiles->get($selectedId);
+                                
+                                if (!$fileData) {
+                                    $errors[] = "File dengan ID $selectedId tidak ditemukan";
+                                    continue;
+                                }
+                                
+                                $filePath = $fileData['path'];
+                                $fileName = $fileData['name'];
+                                
+                                \Log::info('Processing selected file', [
+                                    'id' => $selectedId,
+                                    'name' => $fileName,
+                                    'path' => $filePath
+                                ]);
+                                
+                                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($filePath)) {
+                                    $result = \Illuminate\Support\Facades\Storage::disk('public')->delete($filePath);
+                                    if ($result) {
+                                        $deleted++;
+                                        \Log::info('Checkbox bulk delete success', ['file' => $fileName]);
+                                    } else {
+                                        $errors[] = "Gagal hapus: $fileName";
+                                    }
+                                } else {
+                                    $errors[] = "File tidak ditemukan: $fileName";
+                                }
+                            } catch (\Exception $e) {
+                                $errors[] = "Error: {$e->getMessage()}";
+                                \Log::error('Checkbox bulk delete error', [
+                                    'error' => $e->getMessage(),
+                                    'id' => $selectedId
+                                ]);
+                            }
+                        }
+                        
+                        \Log::info('=== CHECKBOX BULK DELETE END ===', [
+                            'selected_count' => count($selectedKeys),
+                            'deleted' => $deleted,
+                            'errors' => count($errors)
+                        ]);
+                        
+                        // Show results
                         if ($deleted > 0) {
-                            Notification::make()
+                            \Filament\Notifications\Notification::make()
                                 ->title('Berhasil')
-                                ->body("$deleted file berhasil dihapus" . (count($errors) > 0 ? ". " . count($errors) . " file gagal." : ""))
+                                ->body("$deleted file berhasil dihapus dari " . count($selectedKeys) . " file yang dipilih")
                                 ->success()
                                 ->send();
                         }
                         
                         if (count($errors) > 0) {
-                            Notification::make()
+                            \Filament\Notifications\Notification::make()
                                 ->title('Ada Error')
-                                ->body(implode(', ', array_slice($errors, 0, 3)) . (count($errors) > 3 ? '...' : ''))
+                                ->body(count($errors) . " file gagal dihapus: " . implode(', ', array_slice($errors, 0, 2)))
                                 ->warning()
                                 ->send();
                         }
                         
-                        if ($deleted === 0 && count($errors) === 0) {
-                            Notification::make()
+                        if ($deleted === 0) {
+                            \Filament\Notifications\Notification::make()
                                 ->title('Info')
-                                ->body('Tidak ada file yang dipilih atau ditemukan')
+                                ->body('Tidak ada file yang berhasil dihapus')
                                 ->info()
                                 ->send();
                         }

@@ -26,6 +26,87 @@ class ListFileManager extends ListRecords
                     return redirect()->route('filament.abdira.resources.file-managers.index');
                 }),
                 
+            Actions\Action::make('bulk_delete')
+                ->label('Hapus Multiple File')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->form([
+                    \Filament\Forms\Components\Textarea::make('file_patterns')
+                        ->label('Pola File untuk Dihapus')
+                        ->placeholder('Contoh: *.jpg, alumni/*, berita/*.png (satu per baris)')
+                        ->rows(3)
+                        ->helperText('Masukkan pola file yang ingin dihapus. Gunakan * untuk wildcard.')
+                        ->required(),
+                ])
+                ->action(function (array $data) {
+                    $patterns = explode("\n", trim($data['file_patterns']));
+                    $patterns = array_map('trim', $patterns);
+                    $patterns = array_filter($patterns);
+                    
+                    $deleted = 0;
+                    $errors = [];
+                    
+                    foreach ($patterns as $pattern) {
+                        try {
+                            if (strpos($pattern, '*') !== false) {
+                                // Handle wildcard patterns
+                                $publicPath = storage_path('app/public');
+                                $files = \Illuminate\Support\Facades\File::allFiles($publicPath);
+                                
+                                foreach ($files as $file) {
+                                    $relativePath = str_replace($publicPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+                                    $relativePath = str_replace('\\', '/', $relativePath);
+                                    
+                                    if ($this->matchesPattern($relativePath, $pattern)) {
+                                        if (\Illuminate\Support\Facades\Storage::disk('public')->delete($relativePath)) {
+                                            $deleted++;
+                                            \Log::info('Bulk pattern delete', ['file' => $relativePath, 'pattern' => $pattern]);
+                                        }
+                                    }
+                                }
+                            } else {
+                                // Direct file path
+                                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($pattern)) {
+                                    if (\Illuminate\Support\Facades\Storage::disk('public')->delete($pattern)) {
+                                        $deleted++;
+                                        \Log::info('Direct file delete', ['file' => $pattern]);
+                                    }
+                                } else {
+                                    $errors[] = "File tidak ditemukan: $pattern";
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            $errors[] = "Error: {$e->getMessage()}";
+                            \Log::error('Bulk delete pattern error', ['pattern' => $pattern, 'error' => $e->getMessage()]);
+                        }
+                    }
+                    
+                    // Show results
+                    if ($deleted > 0) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Berhasil')
+                            ->body("$deleted file berhasil dihapus" . (count($errors) > 0 ? ". " . count($errors) . " error." : ""))
+                            ->success()
+                            ->send();
+                    }
+                    
+                    if (count($errors) > 0) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Ada Error')
+                            ->body(implode(', ', array_slice($errors, 0, 3)))
+                            ->warning()
+                            ->send();
+                    }
+                    
+                    if ($deleted === 0) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Info')
+                            ->body('Tidak ada file yang dihapus')
+                            ->info()
+                            ->send();
+                    }
+                }),
+                
             Actions\Action::make('test_download')
                 ->label('Test Download')
                 ->icon('heroicon-o-arrow-down-tray')
@@ -52,6 +133,15 @@ class ListFileManager extends ListRecords
                         ->send();
                 }),
         ];
+    }
+
+    private function matchesPattern($filename, $pattern)
+    {
+        // Simple wildcard matching
+        $pattern = str_replace('*', '.*', $pattern);
+        $pattern = '/^' . str_replace('/', '\/', $pattern) . '$/i';
+        
+        return preg_match($pattern, $filename);
     }
 
     public function mount(): void
