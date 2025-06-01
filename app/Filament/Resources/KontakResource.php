@@ -28,7 +28,7 @@ class KontakResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->withCount(['user']); // Eager loading dengan count
+            ->with(['admin']);
     }
 
     public static function form(Form $form): Form
@@ -49,7 +49,6 @@ class KontakResource extends Resource
                         Forms\Components\TextInput::make('telepon')
                             ->label('Telepon')
                             ->tel()
-                            ->required()
                             ->maxLength(20),
                         Forms\Components\TextInput::make('subjek')
                             ->label('Subjek')
@@ -60,13 +59,26 @@ class KontakResource extends Resource
                             ->required()
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                        Forms\Components\Select::make('user_id')
-                            ->label('User')
-                            ->relationship('user', 'name')
+                    ])->columns(2),
+                
+                Forms\Components\Section::make('Status & Admin')
+                    ->schema([
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'baru' => 'Baru',
+                                'dibaca' => 'Dibaca', 
+                                'diproses' => 'Diproses',
+                                'selesai' => 'Selesai'
+                            ])
+                            ->default('baru'),
+                        Forms\Components\Select::make('admin_id')
+                            ->label('Admin')
+                            ->relationship('admin', 'name')
                             ->preload()
                             ->searchable()
                             ->options(function () {
-                                return Cache::remember('user_options', 3600, function () {
+                                return Cache::remember('admin_options', 3600, function () {
                                     return \App\Models\User::pluck('name', 'id')->toArray();
                                 });
                             }),
@@ -74,6 +86,13 @@ class KontakResource extends Resource
                             ->label('Sudah Dibaca')
                             ->helperText('Apakah pesan sudah dibaca?')
                             ->default(false),
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Aktif')
+                            ->default(true),
+                        Forms\Components\Textarea::make('catatan_admin')
+                            ->label('Catatan Admin')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -99,27 +118,43 @@ class KontakResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
+                Tables\Columns\SelectColumn::make('status')
+                    ->label('Status')
+                    ->options([
+                        'baru' => 'Baru',
+                        'dibaca' => 'Dibaca', 
+                        'diproses' => 'Diproses',
+                        'selesai' => 'Selesai'
+                    ]),
+                Tables\Columns\TextColumn::make('admin.name')
+                    ->label('Admin')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_read')
                     ->label('Sudah Dibaca')
                     ->boolean(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Aktif')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Tanggal')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('user')
-                    ->relationship('user', 'name'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'baru' => 'Baru',
+                        'dibaca' => 'Dibaca', 
+                        'diproses' => 'Diproses',
+                        'selesai' => 'Selesai'
+                    ]),
+                Tables\Filters\SelectFilter::make('admin')
+                    ->relationship('admin', 'name'),
                 Tables\Filters\TernaryFilter::make('is_read')
                     ->label('Sudah Dibaca'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Aktif'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
