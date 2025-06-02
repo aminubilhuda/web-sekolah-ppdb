@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - {{ config('app.name', 'Sekolah') }}</title>
-    
+
     <!-- Basic Meta Tags -->
     <meta name="description" content="@yield('meta_description', 'Website Resmi Sekolah')">
     <meta name="keywords" content="@yield('meta_keywords', 'sekolah, pendidikan, smk')">
     <meta name="author" content="{{ $profil ? $profil->nama_sekolah : config('app.name') }}">
     <meta name="robots" content="index, follow">
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">
-    
+
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="@yield('title') - {{ config('app.name', 'Sekolah') }}">
     <meta property="og:description" content="@yield('meta_description', 'Website Resmi Sekolah')">
@@ -21,64 +22,66 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:site_name" content="{{ $profil ? $profil->nama_sekolah : config('app.name') }}">
     <meta property="og:locale" content="id_ID">
-    @if($profil && $profil->banner_highlight)
+    @if ($profil && $profil->banner_highlight)
         <meta property="og:image" content="{{ asset('storage/' . $profil->banner_highlight) }}">
         <meta property="og:image:width" content="1920">
         <meta property="og:image:height" content="1080">
         <meta property="og:image:type" content="image/jpeg">
     @endif
-    
+
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title') - {{ config('app.name', 'Sekolah') }}">
     <meta name="twitter:description" content="@yield('meta_description', 'Website Resmi Sekolah')">
-    @if($profil && $profil->banner_highlight)
+    @if ($profil && $profil->banner_highlight)
         <meta name="twitter:image" content="{{ asset('storage/' . $profil->banner_highlight) }}">
     @endif
-    @if($profil && $profil->twitter)
+    @if ($profil && $profil->twitter)
         <meta name="twitter:site" content="{{ $profil->twitter }}">
     @endif
-    
+
     <!-- Additional SEO Meta Tags -->
     <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#1e40af">
     <meta name="msapplication-TileColor" content="#1e40af">
-    
+
     <!-- Geo Location Meta (if available) -->
-    @if($profil && $profil->alamat)
+    @if ($profil && $profil->alamat)
         <meta name="geo.region" content="ID">
         <meta name="geo.placename" content="{{ $profil->kabupaten }}, {{ $profil->provinsi }}">
     @endif
-    
+
     <!-- Favicon -->
     @php
         $profil = app('profil_sekolah');
     @endphp
-    @if($profil && $profil->favicon)
+    @if ($profil && $profil->favicon)
         <link rel="icon" type="image/x-icon" href="{{ $profil->favicon_url }}">
         <link rel="apple-touch-icon" href="{{ $profil->favicon_url }}">
     @else
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
         <link rel="apple-touch-icon" href="{{ asset('favicon.ico') }}">
     @endif
-    
+
     <!-- Preconnect untuk Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
+
+
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <!-- Additional Styles -->
     @stack('styles')
-    
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
@@ -115,27 +118,29 @@
         ]
     }
     </script>
-    
+
     <!-- Additional structured data for specific pages -->
     @stack('structured_data')
-    
+
 </head>
+
 <body class="font-sans antialiased bg-gray-50">
     <!-- Header -->
     @include('layouts.partials.header')
-    
+
     <!-- Navigation -->
     @include('layouts.partials.navigation')
-    
+
     <!-- Main Content -->
     <main class="min-h-screen">
-            @yield('content')
+        @yield('content')
     </main>
-    
+
     <!-- Footer -->
     @include('layouts.partials.footer')
-    
+
     <!-- Scripts -->
     @stack('scripts')
 </body>
-</html> 
+
+</html>
