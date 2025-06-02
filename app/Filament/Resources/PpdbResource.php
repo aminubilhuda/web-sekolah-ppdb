@@ -415,10 +415,10 @@ class PpdbResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('status', 'Menunggu')->count();
-    }
+    // public static function getNavigationBadge(): ?string
+    // {
+    //     return static::getModel()::where('status', 'Menunggu')->count();
+    // }
 
     public static function getNavigationBadgeColor(): string|array|null
     {

@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
@@ -26,15 +27,54 @@ class UserResource extends Resource
     protected static ?string $navigationLabel = 'Pengguna';
     protected static ?string $modelLabel = 'Pengguna';
     protected static ?string $pluralModelLabel = 'Pengguna';
+    protected static ?string $navigationGroup = 'Settings';
     protected static ?int $navigationSort = 18;
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery(); // Tanpa withCount karena User tidak memiliki relasi tersebut
+        $query = parent::getEloquentQuery();
+        
+        // Filter berdasarkan role user yang login
+        if (auth()->user()->role === 'guru') {
+            $query->where('role', 'siswa');
+        } elseif (auth()->user()->role !== 'admin') {
+            $query->where('id', auth()->id());
+        }
+        
+        return $query;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        $user = auth()->user();
+        
+        if (!$record instanceof User) {
+            return false;
+        }
+        
+        return match($user->role) {
+            'admin' => true,
+            'guru' => $record->role === 'siswa',
+            default => $user->id === $record->id,
+        };
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        $user = auth()->user();
+        return $user->role === 'admin' && $user->id !== $record->id;
     }
 
     public static function form(Form $form): Form
     {
+        $user = auth()->user();
+        $isAdmin = $user->role === 'admin';
+        
         return $form
             ->schema([
                 Forms\Components\Section::make('Data Pengguna')
@@ -43,29 +83,52 @@ class UserResource extends Resource
                             ->label('Nama')
                             ->required()
                             ->maxLength(255),
+                        Forms\Components\TextInput::make('username')
+                            ->label('Username')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         Forms\Components\DateTimePicker::make('email_verified_at')
-                            ->label('Email Terverifikasi'),
+                            ->label('Email Terverifikasi')
+                            ->visible($isAdmin),
                         Forms\Components\TextInput::make('password')
                             ->password()
                             ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $context): bool => $context === 'create')
                             ->maxLength(255),
+                        Forms\Components\Select::make('role')
+                            ->label('Role')
+                            ->options([
+                                'admin' => 'Admin',
+                                'staff' => 'Staff',
+                                'guru' => 'Guru',
+                                'siswa' => 'Siswa',
+                            ])
+                            ->required()
+                            ->visible($isAdmin),
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'active' => 'Active',
+                                'inactive' => 'Inactive',
+                                'blocked' => 'Blocked',
+                            ])
+                            ->default('active')
+                            ->required()
+                            ->visible($isAdmin),
                         Forms\Components\Select::make('roles')
+                            ->label('Additional Roles')
                             ->multiple()
                             ->relationship('roles', 'name')
                             ->preload()
                             ->searchable()
-                            ->options(function () {
-                                return Cache::remember('role_options', 3600, function () {
-                                    return \Spatie\Permission\Models\Role::pluck('name', 'id')->toArray();
-                                });
-                            }),
+                            ->visible($isAdmin),
                     ])->columns(2),
             ]);
     }
@@ -78,29 +141,56 @@ class UserResource extends Resource
                     ->label('Nama')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('username')
+                    ->label('Username')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('role')
+                    ->label('Role')
+                    ->sortable(),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->colors([
+                        'success' => 'active',
+                        'danger' => 'blocked',
+                        'warning' => 'inactive',
+                    ]),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Additional Roles')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label('Email Terverifikasi')
                     ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('roles.name')
-                    ->label('Peran')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('roles')
-                    ->relationship('roles', 'name'),
+                Tables\Filters\SelectFilter::make('role')
+                    ->options([
+                        'admin' => 'Admin',
+                        'staff' => 'Staff',
+                        'guru' => 'Guru',
+                        'siswa' => 'Siswa',
+                    ]),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                        'blocked' => 'Blocked',
+                    ]),
+                Tables\Filters\TernaryFilter::make('email_verified')
+                    ->label('Email Terverifikasi')
+                    ->queries(
+                        true: fn ($query) => $query->whereNotNull('email_verified_at'),
+                        false: fn ($query) => $query->whereNull('email_verified_at'),
+                    ),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -130,4 +220,4 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
-} 
+}

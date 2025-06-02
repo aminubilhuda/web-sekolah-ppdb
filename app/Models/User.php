@@ -9,11 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasPermissions;
 use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasPermissions;
 
     /**
      * The attributes that are mass assignable.
@@ -24,7 +25,7 @@ class User extends Authenticatable
         'name',
         'email',
         'username',
-        'role',
+        'role', // Legacy role field
         'status',
         'password',
     ];
@@ -106,5 +107,59 @@ class User extends Authenticatable
                 Cache::forget("users_role_{$role->name}");
             }
         });
+    }
+
+    /**
+     * Sync the legacy role field with Spatie roles
+     */
+    public function syncLegacyRole()
+    {
+        if ($this->role && !$this->hasRole($this->role)) {
+            $this->assignRole($this->role);
+        }
+    }
+
+    /**
+     * Override the save method to sync legacy role
+     */
+    public function save(array $options = [])
+    {
+        $saved = parent::save($options);
+        $this->syncLegacyRole();
+        return $saved;
+    }
+
+    /**
+     * Get all permissions for the user, including inherited ones from roles
+     */
+    public function getAllPermissions()
+    {
+        return $this->getAllPermissions();
+    }
+
+    /**
+     * Check if user has any of the given permissions
+     */
+    public function hasAnyPermission(...$permissions)
+    {
+        return $this->hasAnyPermission($permissions);
+    }
+
+    /**
+     * Get user's highest role
+     */
+    public function getHighestRole()
+    {
+        $roleHierarchy = [
+            'super-admin' => 5,
+            'admin' => 4,
+            'staff' => 3,
+            'guru' => 2,
+            'siswa' => 1
+        ];
+
+        return $this->roles
+            ->sortByDesc(fn($role) => $roleHierarchy[$role->name] ?? 0)
+            ->first();
     }
 }
