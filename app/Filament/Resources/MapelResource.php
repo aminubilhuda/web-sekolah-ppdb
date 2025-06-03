@@ -23,6 +23,7 @@ class MapelResource extends Resource
     protected static ?string $navigationLabel = 'Mata Pelajaran';
     protected static ?string $modelLabel = 'Mata Pelajaran';
     protected static ?string $pluralModelLabel = 'Mata Pelajaran';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
     protected static ?int $navigationSort = 8;
 
     public static function getEloquentQuery(): Builder

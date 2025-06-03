@@ -23,6 +23,7 @@ class KontakResource extends Resource
     protected static ?string $navigationLabel = 'Kontak';
     protected static ?string $modelLabel = 'Kontak';
     protected static ?string $pluralModelLabel = 'Kontak';
+    protected static ?string $navigationGroup = 'Pengaturan & Profil';
     protected static ?int $navigationSort = 23;
 
     public static function getEloquentQuery(): Builder

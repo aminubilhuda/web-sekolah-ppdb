@@ -5,16 +5,24 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Ppdb;
 use App\Models\Jurusan;
-use App\Models\PPDBInfo;
+use App\Models\PpdbInfo;
+use App\Services\FonnteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PPDBController extends Controller
 {
+    protected $fonnteService;
+
+    public function __construct(FonnteService $fonnteService)
+    {
+        $this->fonnteService = $fonnteService;
+    }
+
     public function index()
     {
         $jurusans = Jurusan::all();
-        $ppdbInfo = PPDBInfo::first();
+        $ppdbInfo = PpdbInfo::first();
         return view('web.ppdb.index', compact('jurusans', 'ppdbInfo'));
     }
 
@@ -75,9 +83,32 @@ class PPDBController extends Controller
         // Generate nomor pendaftaran
         $validated['nomor_pendaftaran'] = 'PPDB-' . date('Y') . '-' . str_pad(Ppdb::count() + 1, 4, '0', STR_PAD_LEFT);
 
-        Ppdb::create($validated);
+        // Create PPDB record
+        $ppdb = Ppdb::create($validated);
 
-        return redirect()->route('web.ppdb.success')->with('success', 'Pendaftaran berhasil! Silahkan cek email Anda untuk informasi selanjutnya.');
+        // Get jurusan data
+        $jurusan = Jurusan::find($validated['jurusan_pilihan']);
+
+        // Prepare data for notification
+        $notificationData = [
+            'nomor_pendaftaran' => $ppdb->nomor_pendaftaran,
+            'nama' => $ppdb->nama_lengkap,
+            'jurusan' => $jurusan->nama_jurusan,
+            'asal_sekolah' => $ppdb->asal_sekolah,
+            'no_hp' => $ppdb->no_hp,
+            'nisn' => $ppdb->nisn,
+            'foto' => $ppdb->foto ? Storage::url($ppdb->foto) : 'Belum diupload',
+            'ijazah' => $ppdb->ijazah ? Storage::url($ppdb->ijazah) : 'Belum diupload',
+            'kk' => $ppdb->kk ? Storage::url($ppdb->kk) : 'Belum diupload',
+        ];
+
+        // Send notification to student
+        $this->fonnteService->sendPPDBNotification($notificationData);
+
+        // Send notification to admin
+        $this->fonnteService->sendPPDBAdminNotification($notificationData);
+
+        return redirect()->route('web.ppdb.success')->with('success', 'Pendaftaran berhasil! Silahkan cek WhatsApp Anda untuk informasi selanjutnya.');
     }
 
     public function success()

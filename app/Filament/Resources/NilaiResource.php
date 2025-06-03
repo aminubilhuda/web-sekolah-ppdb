@@ -23,6 +23,7 @@ class NilaiResource extends Resource
     protected static ?string $navigationLabel = 'Nilai';
     protected static ?string $modelLabel = 'Nilai';
     protected static ?string $pluralModelLabel = 'Nilai';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
     protected static ?int $navigationSort = 9;
 
     public static function getEloquentQuery(): Builder

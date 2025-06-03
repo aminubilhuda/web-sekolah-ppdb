@@ -25,6 +25,7 @@ class GaleriFotoResource extends Resource
     protected static ?string $navigationLabel = 'Foto Galeri';
     protected static ?string $modelLabel = 'Foto Galeri';
     protected static ?string $pluralModelLabel = 'Foto Galeri';
+    protected static ?string $navigationGroup = 'Konten Website';
     protected static ?int $navigationSort = 15;
 
     public static function getEloquentQuery(): Builder

@@ -36,4 +36,10 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
     ],
 
+    'fonnte' => [
+        'base_url' => env('FONNTE_BASE_URL', 'https://api.fonnte.com/send'),
+        'api_key' => env('FONNTE_API_KEY'),
+        'admin_number' => env('FONNTE_ADMIN_NUMBER', '628xxxxxxxxxx'),
+    ],
+
 ];

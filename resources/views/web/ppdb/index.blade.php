@@ -19,9 +19,12 @@
         <div class="relative max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
             <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">{{ $ppdbInfo->judul ?? 'Penerimaan Peserta Didik Baru' }}</h1>
             <p class="mt-6 text-xl text-primary-100 max-w-3xl">{{ $ppdbInfo->subtitle ?? 'Tahun Ajaran 2024/2025' }}</p>
-            <div class="mt-8">
+            <div class="mt-8 flex space-x-4">
                 <a href="{{ route('web.ppdb.form') }}" class="inline-block bg-white text-primary-600 px-8 py-3 rounded-md font-medium hover:bg-primary-50">
                     Daftar Sekarang
+                </a>
+                <a href="{{ route('web.ppdb.status') }}" class="inline-block bg-primary-700 text-white px-8 py-3 rounded-md font-medium hover:bg-primary-800">
+                    Cek Status Pendaftaran
                 </a>
             </div>
         </div>

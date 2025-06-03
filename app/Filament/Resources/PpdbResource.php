@@ -29,6 +29,7 @@ class PpdbResource extends Resource
     protected static ?string $navigationLabel = 'Pendaftar PPDB';
     protected static ?string $modelLabel = 'Pendaftar PPDB';
     protected static ?string $pluralModelLabel = 'Pendaftar PPDB';
+    protected static ?string $navigationGroup = 'PPDB & Pendaftaran';
     protected static ?int $navigationSort = 2;
 
     public static function getEloquentQuery(): Builder

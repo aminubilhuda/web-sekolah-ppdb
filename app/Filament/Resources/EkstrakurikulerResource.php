@@ -24,6 +24,8 @@ class EkstrakurikulerResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Ekstrakurikuler';
 
+    protected static ?string $navigationGroup = 'PPDB & Pendaftaran';
+
     protected static ?int $navigationSort = 5;
 
     public static function getEloquentQuery(): Builder

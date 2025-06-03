@@ -21,6 +21,7 @@ class AlumniResource extends Resource
     protected static ?string $navigationLabel = 'Alumni';
     protected static ?string $modelLabel = 'Alumni';
     protected static ?string $pluralModelLabel = 'Alumni';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
     protected static ?int $navigationSort = 5;
 
     public static function getEloquentQuery(): Builder

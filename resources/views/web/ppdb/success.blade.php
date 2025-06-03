@@ -12,7 +12,7 @@
                         <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
                     </div>
                     <h2 class="mb-4">Pendaftaran Berhasil!</h2>
-                    <p class="mb-4">Terima kasih telah mendaftar di PPDB kami. Silahkan cek email Anda untuk informasi selanjutnya.</p>
+                    <p class="mb-4">Terima kasih telah mendaftar di PPDB kami. Silahkan cek WhatsApp Anda untuk informasi selanjutnya.</p>
                     <div class="d-flex justify-content-center gap-3">
                         <a href="{{ route('web.ppdb.status') }}" class="btn btn-primary">Cek Status Pendaftaran</a>
                         <a href="{{ route('web.home') }}" class="btn btn-secondary">Kembali ke Beranda</a>

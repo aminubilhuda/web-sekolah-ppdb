@@ -28,6 +28,8 @@ class KategoriResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kategori';
 
+    protected static ?string $navigationGroup = 'Konten Website';
+
     protected static ?int $navigationSort = 17;
 
     public static function getEloquentQuery(): Builder

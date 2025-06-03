@@ -25,12 +25,26 @@ class ProfilResource extends Resource
     protected static ?string $navigationLabel = 'Profil';
     protected static ?string $modelLabel = 'Profil';
     protected static ?string $pluralModelLabel = 'Profil';
+    protected static ?string $navigationGroup = 'Pengaturan & Profil';
     protected static ?int $navigationSort = 22;
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->withCount(['user']); // Eager loading dengan count
+            ->select([
+                'profils.id',
+                'profils.nama_lengkap',
+                'profils.nik',
+                'profils.tempat_lahir',
+                'profils.tanggal_lahir',
+                'profils.jenis_kelamin',
+                'profils.foto',
+                'profils.created_at',
+                'profils.updated_at',
+                'users.name as user_name'
+            ])
+            ->join('users', 'profils.user_id', '=', 'users.id')
+            ->with(['user:id,name']); // Optimize eager loading
     }
 
     public static function form(Form $form): Form
@@ -159,7 +173,7 @@ class ProfilResource extends Resource
                     ->label('Jenis Kelamin')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user.name')
+                Tables\Columns\TextColumn::make('user_name')
                     ->label('User')
                     ->searchable()
                     ->sortable(),
@@ -191,6 +205,10 @@ class ProfilResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
+            ->defaultPaginationPageOption(25) // Set default pagination
+            ->persistFiltersInSession() // Persist filters
+            ->persistSortInSession() // Persist sorting
+            ->persistSearchInSession() // Persist search
             ->defaultSort('nama_lengkap', 'asc');
     }
 

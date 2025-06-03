@@ -30,6 +30,8 @@ class GuruResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Guru';
 
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
+
     protected static ?int $navigationSort = 5;
 
     public static function getEloquentQuery(): Builder
@@ -98,7 +100,7 @@ class GuruResource extends Resource
                             ->imageResizeTargetWidth('500')
                             ->imageResizeTargetHeight('500')
                             ->label('Foto')
-                            ->required()
+                            ->nullable()
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make('deskripsi')
                             ->maxLength(65535)

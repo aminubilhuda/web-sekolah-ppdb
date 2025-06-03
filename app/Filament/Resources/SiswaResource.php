@@ -25,6 +25,7 @@ class SiswaResource extends Resource
     protected static ?string $navigationLabel = 'Siswa';
     protected static ?string $modelLabel = 'Siswa';
     protected static ?string $pluralModelLabel = 'Siswa';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
     protected static ?int $navigationSort = 6;
 
     public static function getEloquentQuery(): Builder

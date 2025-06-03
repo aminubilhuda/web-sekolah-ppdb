@@ -6,9 +6,18 @@ use App\Models\PPDB;
 use App\Models\Jurusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\FonnteService;
+use Illuminate\Support\Facades\Log;
 
 class PPDBController extends Controller
 {
+    protected $fonnteService;
+
+    public function __construct(FonnteService $fonnteService)
+    {
+        $this->fonnteService = $fonnteService;
+    }
+
     public function index()
     {
         $jurusans = Jurusan::all();
@@ -52,9 +61,40 @@ class PPDBController extends Controller
         // Generate nomor pendaftaran
         $validated['nomor_pendaftaran'] = 'PPDB-' . date('Y') . '-' . str_pad(PPDB::count() + 1, 4, '0', STR_PAD_LEFT);
 
-        PPDB::create($validated);
+        // Simpan data pendaftaran
+        $ppdb = PPDB::create($validated);
 
-        return redirect()->route('ppdb.success')->with('success', 'Pendaftaran berhasil! Silahkan cek email Anda untuk informasi selanjutnya.');
+        try {
+            // Kirim notifikasi ke siswa
+            $this->fonnteService->sendPPDBNotification([
+                'nama' => $ppdb->nama,
+                'nomor_pendaftaran' => $ppdb->nomor_pendaftaran,
+                'jurusan' => $ppdb->jurusan->nama,
+                'asal_sekolah' => $ppdb->asal_sekolah,
+                'no_hp' => $ppdb->no_hp
+            ]);
+
+            // Kirim notifikasi ke admin
+            $this->fonnteService->sendPPDBAdminNotification([
+                'nama' => $ppdb->nama,
+                'nisn' => $ppdb->nisn,
+                'nomor_pendaftaran' => $ppdb->nomor_pendaftaran,
+                'jurusan' => $ppdb->jurusan->nama,
+                'asal_sekolah' => $ppdb->asal_sekolah,
+                'no_hp' => $ppdb->no_hp,
+                'foto' => $ppdb->foto,
+                'ijazah' => $ppdb->ijazah,
+                'kk' => $ppdb->kk
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim notifikasi WhatsApp', [
+                'error' => $e->getMessage(),
+                'ppdb_id' => $ppdb->id
+            ]);
+        }
+
+        return redirect()->route('ppdb.success')->with('success', 'Pendaftaran berhasil! Silahkan cek WhatsApp Anda untuk informasi selanjutnya.');
     }
 
     public function success()

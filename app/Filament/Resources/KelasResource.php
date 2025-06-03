@@ -23,6 +23,7 @@ class KelasResource extends Resource
     protected static ?string $navigationLabel = 'Kelas';
     protected static ?string $modelLabel = 'Kelas';
     protected static ?string $pluralModelLabel = 'Kelas';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
     protected static ?int $navigationSort = 7;
 
     public static function getEloquentQuery(): Builder

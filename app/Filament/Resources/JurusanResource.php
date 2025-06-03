@@ -22,6 +22,7 @@ class JurusanResource extends Resource
     protected static ?string $navigationLabel = 'Jurusan';
     protected static ?string $modelLabel = 'Jurusan';
     protected static ?string $pluralModelLabel = 'Jurusan';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
     protected static ?int $navigationSort = 4;
 
     public static function getEloquentQuery(): Builder
@@ -58,7 +59,9 @@ class JurusanResource extends Resource
                         Forms\Components\Select::make('kepala_jurusan_id')
                             ->relationship('kepalaJurusan', 'nama')
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->nullable()
+                            ->placeholder('Pilih Kepala Jurusan'),
                         Forms\Components\Toggle::make('is_active')
                             ->label('Status Aktif')
                             ->helperText('Aktifkan jurusan ini?')
