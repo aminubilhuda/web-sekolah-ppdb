@@ -111,6 +111,11 @@
 
         <div class="border-t border-gray-800 mt-8 pt-8 text-center">
             <p class="text-gray-400">&copy; {{ date('Y') }} {{ $profil->nama_sekolah ?? config('app.name') }}. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="{{ route('privacy-policy') }}" class="text-gray-400 hover:text-white">Kebijakan Privasi</a>
+                <span class="text-gray-600">|</span>
+                <a href="{{ route('terms-of-service') }}" class="text-gray-400 hover:text-white">Syarat dan Ketentuan</a>
+            </div>
         </div>
     </div>
 </footer> 

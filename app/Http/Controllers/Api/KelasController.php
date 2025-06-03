@@ -16,7 +16,7 @@ class KelasController extends Controller
         try {
             Log::info('Mencoba mengambil data kelas');
             $kelas = Kelas::with(['jurusan', 'waliKelas'])
-                ->where('is_active', true)
+                ->where('is_published', true)
                 ->orderBy('nama_kelas', 'asc')
                 ->get();
             
@@ -39,7 +39,7 @@ class KelasController extends Controller
                 'wali_kelas_id' => 'nullable|exists:guru,id',
                 'kapasitas' => 'required|integer|min:1',
                 'tahun_ajaran' => 'required|string|max:9',
-                'is_active' => 'required|boolean'
+                'is_published' => 'required|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -49,11 +49,12 @@ class KelasController extends Controller
 
             $kelas = Kelas::create([
                 'nama_kelas' => $request->nama_kelas,
+                'slug' => \Str::slug($request->nama_kelas),
                 'jurusan_id' => $request->jurusan_id,
                 'wali_kelas_id' => $request->wali_kelas_id,
                 'kapasitas' => $request->kapasitas,
                 'tahun_ajaran' => $request->tahun_ajaran,
-                'is_active' => $request->is_active
+                'is_published' => $request->is_published
             ]);
             
             Log::info('Kelas berhasil disimpan', ['data' => $kelas]);
@@ -94,7 +95,7 @@ class KelasController extends Controller
                 'wali_kelas_id' => 'nullable|exists:guru,id',
                 'kapasitas' => 'sometimes|required|integer|min:1',
                 'tahun_ajaran' => 'sometimes|required|string|max:9',
-                'is_active' => 'sometimes|required|boolean'
+                'is_published' => 'sometimes|required|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -109,7 +110,11 @@ class KelasController extends Controller
                 return ResponseService::notFound('Kelas tidak ditemukan');
             }
 
-            $kelas->update($request->all());
+            if ($request->has('nama_kelas')) {
+                $kelas->slug = \Str::slug($request->nama_kelas);
+            }
+
+            $kelas->update($request->except('slug'));
             
             Log::info('Kelas berhasil diupdate', ['data' => $kelas]);
             return ResponseService::success($kelas, 'Kelas berhasil diupdate');
@@ -146,7 +151,7 @@ class KelasController extends Controller
             Log::info('Mencoba mengambil data kelas berdasarkan jurusan', ['jurusan_id' => $jurusanId]);
             $kelas = Kelas::with(['jurusan', 'waliKelas'])
                 ->where('jurusan_id', $jurusanId)
-                ->where('is_active', true)
+                ->where('is_published', true)
                 ->orderBy('nama_kelas', 'asc')
                 ->get();
             
@@ -164,7 +169,7 @@ class KelasController extends Controller
             Log::info('Mencoba mengambil data kelas berdasarkan tahun ajaran', ['tahun_ajaran' => $tahunAjaran]);
             $kelas = Kelas::with(['jurusan', 'waliKelas'])
                 ->where('tahun_ajaran', $tahunAjaran)
-                ->where('is_active', true)
+                ->where('is_published', true)
                 ->orderBy('nama_kelas', 'asc')
                 ->get();
             

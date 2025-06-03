@@ -178,3 +178,11 @@ Route::get('/file/delete/{path}', function ($path) {
 })->name('file.delete')->where('path', '.*');
 
 Route::get('/infaq', [InfaqController::class, 'index'])->name('infaq.index');
+
+Route::get('/privacy-policy', function () {
+    return view('web.privacy-policy');
+})->name('privacy-policy');
+
+Route::get('/terms-of-service', function () {
+    return view('web.terms-of-service');
+})->name('terms-of-service');

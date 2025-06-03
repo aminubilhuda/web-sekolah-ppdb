@@ -3,71 +3,9 @@
 @section('title', 'Jurusan')
 @section('meta_description', 'Informasi tentang jurusan-jurusan yang tersedia di sekolah kami')
 
-{{-- @push('styles')
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 50;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-content {
-        position: relative;
-        background-color: #fff;
-        margin: 5% auto;
-        padding: 0;
-        width: 90%;
-        max-width: 800px;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-
-    .close-modal {
-        position: absolute;
-        right: 1rem;
-        top: 1rem;
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #fff;
-        cursor: pointer;
-        z-index: 10;
-        background: rgba(0, 0, 0, 0.5);
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-
-    .close-modal:hover {
-        background: rgba(0, 0, 0, 0.7);
-    }
-
-    .modal-image {
-        width: 100%;
-        height: auto;
-        border-radius: 0.5rem 0.5rem 0 0;
-    }
-</style>
-@endpush --}}
 
 @section('content')
-{{-- <!-- Modal Banner Highlight -->
-@if($profilSekolah && $profilSekolah->banner_highlight)
-<div id="bannerModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <img src="{{ asset('storage/' . $profilSekolah->banner_highlight) }}" alt="Banner Highlight" class="modal-image">
-    </div>
-</div>
-@endif --}}
+
 
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Jurusan</h1>

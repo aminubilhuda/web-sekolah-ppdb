@@ -4,6 +4,22 @@
 @section('meta_description', 'Berita terbaru seputar kegiatan dan informasi sekolah')
 
 @section('content')
+
+<!-- AdSense Banner Top -->
+    <div class="w-full bg-white py-2">
+        <div class="container mx-auto px-4">
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-9955875681226195"
+                data-ad-slot="YOUR_AD_SLOT_ID"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Berita Terbaru</h1>
 

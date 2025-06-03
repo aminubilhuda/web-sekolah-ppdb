@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - {{ config('app.name', 'Sekolah') }}</title>
 
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9955875681226195"
+     crossorigin="anonymous"></script>
+
+    <!-- AdSense Overlay -->
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                (adsbygoogle = window.adsbygoogle || []).push({
+                    google_ad_client: "ca-pub-9955875681226195",
+                    enable_page_level_ads: true,
+                    overlays: {bottom: true}
+                });
+            }, 2000); // Muncul setelah 2 detik
+        });
+    </script>
+
     <!-- Basic Meta Tags -->
     <meta name="description" content="@yield('meta_description', 'Website Resmi Sekolah')">
     <meta name="keywords" content="@yield('meta_keywords', 'sekolah, pendidikan, smk')">
@@ -131,10 +148,28 @@
     <!-- Navigation -->
     @include('layouts.partials.navigation')
 
+
+
     <!-- Main Content -->
     <main class="min-h-screen">
         @yield('content')
     </main>
+
+    
+    <!-- AdSense Banner Bottom -->
+    <div class="w-full bg-white py-2">
+        <div class="container mx-auto px-4">
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-9955875681226195"
+                data-ad-slot="YOUR_AD_SLOT_ID"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
 
     <!-- Footer -->
     @include('layouts.partials.footer')
