@@ -139,4 +139,29 @@ class JurusanResource extends Resource
             'edit' => Pages\EditJurusan::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_jurusan');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_jurusan');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_jurusan');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_jurusan');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_jurusan');
+    }
 } 

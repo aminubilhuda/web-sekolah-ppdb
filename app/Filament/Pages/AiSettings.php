@@ -203,4 +203,9 @@ class AiSettings extends Page
             file_put_contents($envFile, $envContent);
         }
     }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('view_ai_setting');
+    }
 } 

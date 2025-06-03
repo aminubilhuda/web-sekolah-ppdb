@@ -15,13 +15,13 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h2 class="h4 mb-3">Visi</h2>
-                    <p class="mb-0">
+                    <div class="mb-0">
                         @if($profil && $profil->visi)
-                            {{ $profil->visi }}
+                            {!! $profil->visi !!}
                         @else
-                            Visi sekolah sedang dalam proses penyusunan.
+                            <p>Visi sekolah sedang dalam proses penyusunan.</p>
                         @endif
-                    </p>
+                    </div>
                 </div>
             </div>
 

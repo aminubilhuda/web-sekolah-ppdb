@@ -198,4 +198,29 @@ class GuruResource extends Resource
                 ->color('success'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_guru');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_guru');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_guru');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_guru');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_guru');
+    }
 } 

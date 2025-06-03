@@ -412,4 +412,19 @@ class ProfilSekolahResource extends Resource
             'edit' => Pages\EditProfilSekolah::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_profil_sekolah');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_profil_sekolah');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_profil_sekolah');
+    }
 } 

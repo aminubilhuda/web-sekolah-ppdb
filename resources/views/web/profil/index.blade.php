@@ -36,7 +36,7 @@
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Visi</h2>
                 <div class="prose max-w-none">
                     @if($profil && $profil->visi)
-                        <p>{{ $profil->visi }}</p>
+                        {!! $profil->visi !!}
                     @else
                         <p class="text-gray-600">Visi sekolah sedang dalam proses penyusunan.</p>
                     @endif

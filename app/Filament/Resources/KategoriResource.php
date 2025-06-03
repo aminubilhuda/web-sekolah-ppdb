@@ -127,4 +127,29 @@ class KategoriResource extends Resource
             'edit' => Pages\EditKategori::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_kategori');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_kategori');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_kategori');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_kategori');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_kategori');
+    }
 } 

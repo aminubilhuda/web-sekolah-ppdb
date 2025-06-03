@@ -212,4 +212,29 @@ class PpdbInfoResource extends Resource
             'edit' => Pages\EditPpdbInfo::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_info_ppdb');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_info_ppdb');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_info_ppdb');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_info_ppdb');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_info_ppdb');
+    }
 } 

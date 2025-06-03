@@ -159,4 +159,29 @@ class FasilitasResource extends Resource
     // {
     //     return static::getModel()::count();
     // }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_fasilitas');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_fasilitas');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_fasilitas');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_fasilitas');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_fasilitas');
+    }
 }

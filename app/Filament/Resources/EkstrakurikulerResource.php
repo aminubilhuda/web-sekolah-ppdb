@@ -117,4 +117,29 @@ class EkstrakurikulerResource extends Resource
             'edit' => Pages\EditEkstrakurikuler::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_ekstrakurikuler');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_ekstrakurikuler');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_ekstrakurikuler');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_ekstrakurikuler');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_ekstrakurikuler');
+    }
 } 

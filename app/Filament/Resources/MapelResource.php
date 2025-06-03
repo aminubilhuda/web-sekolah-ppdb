@@ -128,4 +128,29 @@ class MapelResource extends Resource
             'edit' => Pages\EditMapel::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_mapel');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_mapel');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_mapel');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_mapel');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_mapel');
+    }
 } 

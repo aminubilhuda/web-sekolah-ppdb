@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('pekerjaan_ibu');
             $table->string('no_hp_ibu');
             $table->string('alamat_ortu');
-            $table->string('jurusan_pilihan');
+            $table->foreignId('jurusan_pilihan')->constrained('jurusan')->onDelete('cascade');
             $table->string('foto')->nullable();
             $table->string('ijazah')->nullable();
             $table->string('kk')->nullable();

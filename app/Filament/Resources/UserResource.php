@@ -44,30 +44,29 @@ class UserResource extends Resource
         return $query;
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view-users');
+    }
+
     public static function canCreate(): bool
     {
-        return auth()->user()->role === 'admin';
+        return auth()->user()?->can('create-users');
     }
 
-    public static function canEdit(Model $record): bool
+    public static function canEdit($record): bool
     {
-        $user = auth()->user();
-        
-        if (!$record instanceof User) {
-            return false;
-        }
-        
-        return match($user->role) {
-            'admin' => true,
-            'guru' => $record->role === 'siswa',
-            default => $user->id === $record->id,
-        };
+        return auth()->user()?->can('edit-users');
     }
 
-    public static function canDelete(Model $record): bool
+    public static function canDelete($record): bool
     {
-        $user = auth()->user();
-        return $user->role === 'admin' && $user->id !== $record->id;
+        return auth()->user()?->can('delete-users');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view-users');
     }
 
     public static function form(Form $form): Form

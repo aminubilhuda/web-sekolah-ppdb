@@ -130,4 +130,29 @@ class AgendaResource extends Resource
             'edit' => Pages\EditAgenda::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_agenda');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_agenda');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_agenda');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_agenda');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_agenda');
+    }
 } 

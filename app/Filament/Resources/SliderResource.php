@@ -136,4 +136,29 @@ class SliderResource extends Resource
     {
         return view()->shared('sliderInactiveCount');
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_slider');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_slider');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_slider');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_slider');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_slider');
+    }
 }

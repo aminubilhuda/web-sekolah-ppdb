@@ -256,4 +256,29 @@ class SiswaResource extends Resource
             'edit' => Pages\EditSiswa::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_siswa');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_siswa');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_siswa');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_siswa');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_siswa');
+    }
 } 

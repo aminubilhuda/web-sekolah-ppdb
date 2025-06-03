@@ -153,4 +153,29 @@ class FonnteSettingResource extends Resource
     {
         return parent::getEloquentQuery()->where('group', 'fonnte');
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_fonntesetting');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_fonntesetting');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_fonntesetting');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_fonntesetting');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_fonntesetting');
+    }
 } 

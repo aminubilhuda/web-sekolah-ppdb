@@ -139,4 +139,29 @@ class InfaqResource extends Resource
             'edit' => Pages\EditInfaq::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_infaq');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_infaq');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_infaq');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_infaq');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_infaq');
+    }
 }

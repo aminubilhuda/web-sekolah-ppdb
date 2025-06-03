@@ -149,4 +149,29 @@ class MitraIndustriResource extends Resource
             'edit' => Pages\EditMitraIndustri::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_mitra_industri');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_mitra_industri');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_mitra_industri');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_mitra_industri');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_mitra_industri');
+    }
 } 

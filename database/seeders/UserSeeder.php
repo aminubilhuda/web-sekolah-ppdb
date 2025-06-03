@@ -19,5 +19,23 @@ class UserSeeder extends Seeder
             'role' => 'admin',
             'status' => 'active',
         ]);
+        $superAdmin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin@superadmin.com',
+            'username' => 'superadmin',
+            'password' => Hash::make('superadmin'),
+            'email_verified_at' => now(),
+            'role' => 'super-admin',
+            'status' => 'active',
+        ]);
+        $guru = User::create([
+            'name' => 'Guru',
+            'email' => 'guru@guru.com',
+            'username' => 'guru',
+            'password' => Hash::make('guru'),
+            'email_verified_at' => now(),
+            'role' => 'guru',
+            'status' => 'active',
+        ]);
     }
 } 

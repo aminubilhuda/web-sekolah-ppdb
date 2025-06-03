@@ -468,4 +468,25 @@ class PpdbResource extends Resource
             'persentase_diterima' => $total > 0 ? round(($diterima / $total) * 100, 1) : 0,
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_ppdb');
+    }
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_ppdb');
+    }
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_ppdb');
+    }
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_ppdb');
+    }
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_ppdb');
+    }
 } 

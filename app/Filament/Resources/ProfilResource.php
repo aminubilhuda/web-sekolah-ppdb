@@ -227,4 +227,19 @@ class ProfilResource extends Resource
             'edit' => Pages\EditProfil::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_profil');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_profil');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_profil');
+    }
 } 

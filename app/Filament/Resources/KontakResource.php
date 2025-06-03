@@ -185,4 +185,29 @@ class KontakResource extends Resource
             'edit' => Pages\EditKontak::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_kontak');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_kontak');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_kontak');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_kontak');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_kontak');
+    }
 } 

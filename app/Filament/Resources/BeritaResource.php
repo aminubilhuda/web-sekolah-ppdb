@@ -292,4 +292,29 @@ class BeritaResource extends Resource
             'edit' => Pages\EditBerita::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_berita');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_berita');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_berita');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_berita');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_berita');
+    }
 } 

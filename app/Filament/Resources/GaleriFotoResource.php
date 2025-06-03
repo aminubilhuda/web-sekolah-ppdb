@@ -135,4 +135,29 @@ class GaleriFotoResource extends Resource
             'edit' => Pages\EditGaleriFoto::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_foto_galeri');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_foto_galeri');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_foto_galeri');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_foto_galeri');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_foto_galeri');
+    }
 } 

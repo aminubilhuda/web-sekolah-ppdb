@@ -237,4 +237,29 @@ class PengumumanResource extends Resource
             'edit' => Pages\EditPengumuman::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_pengumuman');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_pengumuman');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_pengumuman');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_pengumuman');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_pengumuman');
+    }
 } 

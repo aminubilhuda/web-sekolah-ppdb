@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             // Finally create users and assign roles
             UserSeeder::class,
             
+            
             // // Data Master
             // KategoriSeeder::class,
             // KategoriPrestasiSeeder::class,

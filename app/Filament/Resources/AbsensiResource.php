@@ -46,7 +46,7 @@ class AbsensiResource extends Resource
                             ->options(function () {
                                 return Cache::remember('siswa_options', 3600, function () {
                                     return \App\Models\Siswa::where('is_active', true)
-                                        ->pluck('nama', 'id_siswa')
+                                        ->pluck('nama', 'id')
                                         ->toArray();
                                 });
                             }),
@@ -58,7 +58,7 @@ class AbsensiResource extends Resource
                             ->options(function () {
                                 return Cache::remember('guru_options', 3600, function () {
                                     return \App\Models\Guru::where('is_active', true)
-                                        ->pluck('nama', 'id_guru')
+                                        ->pluck('nama', 'id')
                                         ->toArray();
                                 });
                             }),
@@ -164,5 +164,30 @@ class AbsensiResource extends Resource
             'create' => Pages\CreateAbsensi::route('/create'),
             'edit' => Pages\EditAbsensi::route('/{record}/edit'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_absensi');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_absensi');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_absensi');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_absensi');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_absensi');
     }
 } 

@@ -127,4 +127,29 @@ class TahunAjaranResource extends Resource
             'edit' => Pages\EditTahunAjaran::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('view_tahun_ajaran');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('create_tahun_ajaran');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()?->can('edit_tahun_ajaran');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()?->can('delete_tahun_ajaran');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->can('view_tahun_ajaran');
+    }
 } 
