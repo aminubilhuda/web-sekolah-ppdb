@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jurusan;
+use App\Services\ResponseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -21,10 +22,10 @@ class JurusanController extends Controller
                 ->get();
             
             Log::info('Data jurusan berhasil diambil', ['count' => $jurusan->count()]);
-            return response()->json($jurusan);
+            return ResponseService::success($jurusan, 'Data jurusan berhasil diambil');
         } catch (\Exception $e) {
             Log::error('Error mengambil data jurusan: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengambil data jurusan');
         }
     }
 
@@ -44,7 +45,7 @@ class JurusanController extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validasi gagal', ['errors' => $validator->errors()]);
-                return response()->json(['errors' => $validator->errors()], 422);
+                return ResponseService::validationError($validator->errors());
             }
 
             if ($request->hasFile('gambar')) {
@@ -62,10 +63,10 @@ class JurusanController extends Controller
             ]);
             
             Log::info('Jurusan berhasil disimpan', ['data' => $jurusan]);
-            return response()->json($jurusan, 201);
+            return ResponseService::success($jurusan, 'Jurusan berhasil disimpan', 201);
         } catch (\Exception $e) {
             Log::error('Error menyimpan jurusan: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat menyimpan jurusan');
         }
     }
 
@@ -77,14 +78,14 @@ class JurusanController extends Controller
             
             if (!$jurusan) {
                 Log::warning('Jurusan tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Jurusan tidak ditemukan');
             }
             
             Log::info('Detail jurusan berhasil diambil', ['data' => $jurusan]);
-            return response()->json($jurusan);
+            return ResponseService::success($jurusan, 'Detail jurusan berhasil diambil');
         } catch (\Exception $e) {
             Log::error('Error mengambil detail jurusan: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengambil detail jurusan');
         }
     }
 
@@ -104,14 +105,14 @@ class JurusanController extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validasi gagal', ['errors' => $validator->errors()]);
-                return response()->json(['errors' => $validator->errors()], 422);
+                return ResponseService::validationError($validator->errors());
             }
 
             $jurusan = Jurusan::find($id);
             
             if (!$jurusan) {
                 Log::warning('Jurusan tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Jurusan tidak ditemukan');
             }
 
             if ($request->hasFile('gambar')) {
@@ -129,10 +130,10 @@ class JurusanController extends Controller
             $jurusan->update($request->except('gambar'));
             
             Log::info('Jurusan berhasil diupdate', ['data' => $jurusan]);
-            return response()->json($jurusan);
+            return ResponseService::success($jurusan, 'Jurusan berhasil diupdate');
         } catch (\Exception $e) {
             Log::error('Error mengupdate jurusan: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengupdate jurusan');
         }
     }
 
@@ -144,7 +145,7 @@ class JurusanController extends Controller
             
             if (!$jurusan) {
                 Log::warning('Jurusan tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Jurusan tidak ditemukan');
             }
 
             // Hapus gambar
@@ -155,10 +156,10 @@ class JurusanController extends Controller
             $jurusan->delete();
             
             Log::info('Jurusan berhasil dihapus', ['id' => $id]);
-            return response()->json(['message' => 'Data berhasil dihapus']);
+            return ResponseService::success(null, 'Jurusan berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error menghapus jurusan: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat menghapus jurusan');
         }
     }
 } 

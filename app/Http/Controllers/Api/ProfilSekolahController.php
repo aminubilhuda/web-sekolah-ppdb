@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ProfilSekolah;
 use App\Services\CacheService;
+use App\Services\ResponseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -22,14 +23,14 @@ class ProfilSekolahController extends Controller
             
             if (!$profil) {
                 Log::warning('Data profil sekolah tidak ditemukan');
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Data profil sekolah tidak ditemukan');
             }
             
             Log::info('Data profil sekolah berhasil diambil', ['data' => $profil]);
-            return response()->json($profil);
+            return ResponseService::success($profil, 'Data profil sekolah berhasil diambil');
         } catch (\Exception $e) {
             Log::error('Error mengambil data profil sekolah: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengambil data profil sekolah');
         }
     }
 
@@ -78,16 +79,16 @@ class ProfilSekolahController extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validasi gagal', ['errors' => $validator->errors()]);
-                return response()->json(['errors' => $validator->errors()], 422);
+                return ResponseService::validationError($validator->errors());
             }
 
             $profil = ProfilSekolah::create($request->all());
             
             Log::info('Data profil sekolah berhasil disimpan', ['data' => $profil]);
-            return response()->json($profil, 201);
+            return ResponseService::success($profil, 'Data profil sekolah berhasil disimpan', 201);
         } catch (\Exception $e) {
             Log::error('Error menyimpan data profil sekolah: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat menyimpan data profil sekolah');
         }
     }
 
@@ -102,14 +103,14 @@ class ProfilSekolahController extends Controller
             
             if (!$profil) {
                 Log::warning('Data profil sekolah tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Data profil sekolah tidak ditemukan');
             }
             
             Log::info('Detail profil sekolah berhasil diambil', ['data' => $profil]);
-            return response()->json($profil);
+            return ResponseService::success($profil, 'Detail profil sekolah berhasil diambil');
         } catch (\Exception $e) {
             Log::error('Error mengambil detail profil sekolah: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengambil detail profil sekolah');
         }
     }
 
@@ -158,23 +159,23 @@ class ProfilSekolahController extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validasi gagal', ['errors' => $validator->errors()]);
-                return response()->json(['errors' => $validator->errors()], 422);
+                return ResponseService::validationError($validator->errors());
             }
 
             $profil = ProfilSekolah::find($id);
             
             if (!$profil) {
                 Log::warning('Data profil sekolah tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Data profil sekolah tidak ditemukan');
             }
 
             $profil->update($request->all());
             
             Log::info('Data profil sekolah berhasil diupdate', ['data' => $profil]);
-            return response()->json($profil);
+            return ResponseService::success($profil, 'Data profil sekolah berhasil diupdate');
         } catch (\Exception $e) {
             Log::error('Error mengupdate data profil sekolah: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengupdate data profil sekolah');
         }
     }
 
@@ -189,16 +190,16 @@ class ProfilSekolahController extends Controller
             
             if (!$profil) {
                 Log::warning('Data profil sekolah tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Data profil sekolah tidak ditemukan');
             }
 
             $profil->delete();
             
             Log::info('Data profil sekolah berhasil dihapus', ['id' => $id]);
-            return response()->json(['message' => 'Data berhasil dihapus']);
+            return ResponseService::success(null, 'Data profil sekolah berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error menghapus data profil sekolah: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat menghapus data profil sekolah');
         }
     }
 } 

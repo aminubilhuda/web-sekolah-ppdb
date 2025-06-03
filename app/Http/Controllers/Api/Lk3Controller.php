@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lk3;
+use App\Services\ResponseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -21,10 +22,10 @@ class Lk3Controller extends Controller
             $lk3 = Lk3::where('status', 'published')->orderBy('tahun', 'desc')->get();
             
             Log::info('Data LK3 berhasil diambil', ['count' => $lk3->count()]);
-            return response()->json($lk3);
+            return ResponseService::success($lk3, 'Data LK3 berhasil diambil');
         } catch (\Exception $e) {
             Log::error('Error mengambil data LK3: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengambil data LK3');
         }
     }
 
@@ -46,7 +47,7 @@ class Lk3Controller extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validasi gagal', ['errors' => $validator->errors()]);
-                return response()->json(['errors' => $validator->errors()], 422);
+                return ResponseService::validationError($validator->errors());
             }
 
             $file = $request->file('file');
@@ -61,10 +62,10 @@ class Lk3Controller extends Controller
             ]);
             
             Log::info('Data LK3 berhasil disimpan', ['data' => $lk3]);
-            return response()->json($lk3, 201);
+            return ResponseService::success($lk3, 'Data LK3 berhasil disimpan', 201);
         } catch (\Exception $e) {
             Log::error('Error menyimpan data LK3: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat menyimpan data LK3');
         }
     }
 
@@ -79,14 +80,14 @@ class Lk3Controller extends Controller
             
             if (!$lk3) {
                 Log::warning('Data LK3 tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Data LK3 tidak ditemukan');
             }
             
             Log::info('Detail LK3 berhasil diambil', ['data' => $lk3]);
-            return response()->json($lk3);
+            return ResponseService::success($lk3, 'Detail LK3 berhasil diambil');
         } catch (\Exception $e) {
             Log::error('Error mengambil detail LK3: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengambil detail LK3');
         }
     }
 
@@ -108,14 +109,14 @@ class Lk3Controller extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validasi gagal', ['errors' => $validator->errors()]);
-                return response()->json(['errors' => $validator->errors()], 422);
+                return ResponseService::validationError($validator->errors());
             }
 
             $lk3 = Lk3::find($id);
             
             if (!$lk3) {
                 Log::warning('Data LK3 tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Data LK3 tidak ditemukan');
             }
 
             if ($request->hasFile('file')) {
@@ -131,10 +132,10 @@ class Lk3Controller extends Controller
             $lk3->update($request->except('file'));
             
             Log::info('Data LK3 berhasil diupdate', ['data' => $lk3]);
-            return response()->json($lk3);
+            return ResponseService::success($lk3, 'Data LK3 berhasil diupdate');
         } catch (\Exception $e) {
             Log::error('Error mengupdate data LK3: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat mengupdate data LK3');
         }
     }
 
@@ -149,7 +150,7 @@ class Lk3Controller extends Controller
             
             if (!$lk3) {
                 Log::warning('Data LK3 tidak ditemukan', ['id' => $id]);
-                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+                return ResponseService::notFound('Data LK3 tidak ditemukan');
             }
 
             // Hapus file
@@ -158,10 +159,10 @@ class Lk3Controller extends Controller
             $lk3->delete();
             
             Log::info('Data LK3 berhasil dihapus', ['id' => $id]);
-            return response()->json(['message' => 'Data berhasil dihapus']);
+            return ResponseService::success(null, 'Data LK3 berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error menghapus data LK3: ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan server'], 500);
+            return ResponseService::serverError('Terjadi kesalahan saat menghapus data LK3');
         }
     }
 }
