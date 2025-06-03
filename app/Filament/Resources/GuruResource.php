@@ -14,6 +14,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Traits\HasOptimizedResource;
 use App\Traits\HasOptimizedFileUpload;
+use App\Imports\GuruImport;
+use Filament\Forms\Components\FileUpload;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Notifications\Notification;
 
 class GuruResource extends Resource
 {
@@ -43,7 +47,7 @@ class GuruResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Data Pribadi')
+                Forms\Components\Section::make('Informasi Pribadi')
                     ->schema([
                         Forms\Components\TextInput::make('nama')
                             ->required()
@@ -51,22 +55,17 @@ class GuruResource extends Resource
                         Forms\Components\TextInput::make('nip')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('jabatan')
-                            ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('bidang_studi')
-                            ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('jenis_kelamin')
                             ->options([
                                 'Laki-laki' => 'Laki-laki',
                                 'Perempuan' => 'Perempuan'
-                            ])
-                            ->required(),
+                            ]),
                         Forms\Components\TextInput::make('tempat_lahir')
-                            ->required()
                             ->maxLength(255),
-                        Forms\Components\DatePicker::make('tanggal_lahir')
-                            ->required(),
+                        Forms\Components\DatePicker::make('tanggal_lahir'),
                         Forms\Components\Select::make('agama')
                             ->options([
                                 'Islam' => 'Islam',
@@ -75,18 +74,18 @@ class GuruResource extends Resource
                                 'Hindu' => 'Hindu',
                                 'Buddha' => 'Buddha',
                                 'Konghucu' => 'Konghucu'
-                            ])
-                            ->required(),
+                            ]),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Kontak')
+                    ->schema([
                         Forms\Components\Textarea::make('alamat')
-                            ->required()
-                            ->columnSpanFull(),
+                            ->maxLength(65535),
                         Forms\Components\TextInput::make('no_hp')
                             ->tel()
-                            ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('email')
                             ->email()
-                            ->required()
                             ->maxLength(255),
                     ])->columns(2),
 
@@ -162,23 +161,12 @@ class GuruResource extends Resource
                     ->label('Status Aktif'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function (Guru $record) {
-                        $fileUploadService = app(FileUploadService::class);
-                        $fileUploadService->deleteWithSizes($record->foto);
-                    }),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->before(function ($records) {
-                            $fileUploadService = app(FileUploadService::class);
-                            foreach ($records as $record) {
-                                $fileUploadService->deleteWithSizes($record->foto);
-                            }
-                        }),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -196,6 +184,18 @@ class GuruResource extends Resource
             'index' => Pages\ListGurus::route('/'),
             'create' => Pages\CreateGuru::route('/create'),
             'edit' => Pages\EditGuru::route('/{record}/edit'),
+            'import' => Pages\ImportGuru::route('/import'),
+        ];
+    }
+
+    public static function getHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\Action::make('import')
+                ->label('Import Excel')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->url(static::getUrl('import'))
+                ->color('success'),
         ];
     }
 } 

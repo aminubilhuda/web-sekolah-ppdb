@@ -14,6 +14,11 @@ class ListGurus extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            Actions\Action::make('import')
+                ->label('Import Excel')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->url(fn () => GuruResource::getUrl('import'))
+                ->color('success'),
         ];
     }
 } 

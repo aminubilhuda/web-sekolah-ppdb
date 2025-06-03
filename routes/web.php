@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Web\MitraIndustriController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Web\InfaqController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,7 @@ Route::prefix('alumni')->name('web.alumni.')->group(function () {
 // Guru
 Route::get('/guru', [GuruController::class, 'index'])->name('web.guru.index');
 Route::get('/guru/{guru}', [GuruController::class, 'show'])->name('web.guru.show');
+Route::get('/guru/template/download', [App\Http\Controllers\Web\GuruController::class, 'downloadTemplate'])->name('guru.template.download');
 
 // PPDB
 Route::prefix('ppdb')->name('web.ppdb.')->group(function () {
@@ -174,3 +176,5 @@ Route::get('/file/delete/{path}', function ($path) {
             ->with('error', "Error menghapus file: " . $e->getMessage());
     }
 })->name('file.delete')->where('path', '.*');
+
+Route::get('/infaq', [InfaqController::class, 'index'])->name('infaq.index');

@@ -118,6 +118,7 @@
                             <a href="{{ route('web.agenda.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Agenda</a>
                             <a href="{{ route('web.prestasi.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Prestasi</a>
                             <a href="{{ route('web.galeri.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Galeri</a>
+                            <a href="{{ route('infaq.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Transparansi Infaq</a>
                         </div>
                     </div>
                 </div>
@@ -234,6 +235,7 @@
                     <a href="{{ route('web.agenda.index') }}" class="text-white hover:bg-white hover:bg-opacity-20 block px-3 py-2 rounded-md text-base font-medium transition-all duration-200">Agenda</a>
                     <a href="{{ route('web.prestasi.index') }}" class="text-white hover:bg-white hover:bg-opacity-20 block px-3 py-2 rounded-md text-base font-medium transition-all duration-200">Prestasi</a>
                     <a href="{{ route('web.galeri.index') }}" class="text-white hover:bg-white hover:bg-opacity-20 block px-3 py-2 rounded-md text-base font-medium transition-all duration-200">Galeri</a>
+                    <a href="{{ route('infaq.index') }}" class="text-white hover:bg-white hover:bg-opacity-20 block px-3 py-2 rounded-md text-base font-medium transition-all duration-200">Transparansi Infaq</a>
                 </div>
             </div>
 
